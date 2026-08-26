@@ -125,6 +125,14 @@ h1,h2,h3{font-family:var(--font-d); line-height:1.15; margin:0; text-wrap:balanc
 .teach .note{font-size:.85rem; color:var(--ink2); background:var(--surface2); border-radius:10px; padding:.55rem .75rem; margin-top:.3rem}
 .tonelegend{font-size:.72rem; color:var(--ink2); margin-top:.4rem; font-family:var(--font-w)}
 
+/* audio-pick exercise */
+.audioopt{display:flex; align-items:center; gap:.65rem; font-weight:700; color:var(--ink2)}
+.audioopt svg{width:18px; height:18px; fill:currentColor; flex-shrink:0}
+.audioopt.sel{border-color:var(--accent); color:var(--ink); background:var(--accent-soft)}
+.optletter{font-family:var(--font-d); font-weight:800; font-size:.9rem; background:var(--surface2); border-radius:8px; width:1.9rem; height:1.9rem; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0}
+.audioopt.sel .optletter{background:var(--accent); color:var(--accent-ink)}
+.audioopt .rev{font-family:var(--font-w); font-weight:600}
+
 /* star (frequent review) */
 .starchip{font-size:.85rem; font-weight:700; border-radius:999px; padding:.45rem .95rem; background:var(--surface2); color:var(--ink2)}
 .starchip.on{background:var(--accent-soft); color:var(--accent-deep)}
@@ -610,14 +618,17 @@ renderQuiz(it,p,top);
 }
 function pickMode(lv,p){
 const toks=p.rom.replace(/…|\.{3}/g,"").trim().split(/\s+/).filter(Boolean);
-const pool=lv<=1?["en2rom","rom2en"]:lv<=3?["listen2en","en2rom","rom2en"]:["listen2rom","listen2en","en2rom"];
+let pool=lv<=1?["en2rom","rom2en"]:lv<=3?["listen2en","en2rom","rom2en","en2audio"]:["listen2rom","listen2en","en2audio","en2audio","en2rom"];
+if(!thaiVoice)pool=pool.filter(m=>m!=="listen2en"&&m!=="listen2rom"&&m!=="en2audio");
+if(!pool.length)pool=["en2rom","rom2en"];
 let m=pool[Math.floor(Math.random()*pool.length)];
-if(lv>=3&&toks.length>=4&&Math.random()<0.45)m="unscramble";
+if(lv>=3&&toks.length>=4&&Math.random()<0.35)m="unscramble";
 return m;
 }
 function renderQuiz(it,p,top){
 const lv=P(it.id).lv;const mode=it.fresh?"en2rom":pickMode(lv,p);
 if(mode==="unscramble"){renderUnscramble(it,p,top);return;}
+if(mode==="en2audio"){renderAudioPick(it,p,top);return;}
 const ds=distractors(it.id,3);const opts=shuffle([p].concat(ds));
 let promptHtml="",optHtml="";
 if(mode==="en2rom"){promptHtml='<div class="exprompt">How do you say…</div><div class="exq">'+esc(p.en)+'</div>';
@@ -647,6 +658,36 @@ app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
   const c=document.getElementById("cont");c.disabled=false;c.focus();
 }));
 document.getElementById("cont").addEventListener("click",()=>{SES.i++;renderStep();});
+}
+function renderAudioPick(it,p,top){
+const ds=distractors(it.id,3);const opts=shuffle([p].concat(ds));
+app.innerHTML='<div class="fullview">'+top+'<div class="exwrap">'
++'<div class="exprompt">Tap to listen — which one says…</div><div class="exq">'+esc(p.en)+'</div>'
++'<div class="opts">'+opts.map((o,k)=>'<button class="opt audioopt" data-k="'+k+'"><span class="optletter">'+"ABCD"[k]+'</span>'+ICO.play+'<span class="lbl">Listen</span></button>').join("")
++'</div><div id="fb"></div></div><button class="checkbtn" id="cont" disabled>Check</button></div>';
+wireCommon();
+let sel=-1,answered=false;
+const btns=[...app.querySelectorAll(".audioopt")],cont=document.getElementById("cont");
+btns.forEach((b,k)=>b.addEventListener("click",()=>{
+  speak(opts[k].th,false);
+  if(answered)return;
+  sel=k;btns.forEach(x=>x.classList.remove("sel"));b.classList.add("sel");cont.disabled=false;
+}));
+cont.addEventListener("click",()=>{
+  if(!answered){answered=true;
+    const ok=opts[sel].id===p.id;
+    btns.forEach((b,k)=>{b.classList.remove("sel");
+      b.querySelector(".lbl").outerHTML='<span class="rev">'+esc(opts[k].rom)+'</span>';
+      if(opts[k].id===p.id)b.classList.add("right");else if(k===sel)b.classList.add("wrong");});
+    grade(it,ok);
+    document.getElementById("fb").innerHTML=(ok
+      ?'<div class="feedback good">ถูกต้อง! That’s the one — <span class="fbrom">'+esc(p.rom)+'</span></div>'
+      :'<div class="feedback bad">Not that one. It was <span class="fbrom">'+esc(p.rom)+'</span> — tap them to compare</div>')
+      +'<div style="margin-top:.55rem">'+starChip(p.id)+'</div>';
+    wireStars(document.getElementById("fb"));
+    speak(p.th,false);cont.textContent="Continue";
+  }else{SES.i++;renderStep();}
+});
 }
 function renderUnscramble(it,p,top){
 const toks=p.rom.replace(/…|\.{3}/g,"").trim().split(/\s+/).filter(Boolean);
