@@ -125,6 +125,11 @@ h1,h2,h3{font-family:var(--font-d); line-height:1.15; margin:0; text-wrap:balanc
 .teach .note{font-size:.85rem; color:var(--ink2); background:var(--surface2); border-radius:10px; padding:.55rem .75rem; margin-top:.3rem}
 .tonelegend{font-size:.72rem; color:var(--ink2); margin-top:.4rem; font-family:var(--font-w)}
 
+/* star (frequent review) */
+.starchip{font-size:.85rem; font-weight:700; border-radius:999px; padding:.45rem .95rem; background:var(--surface2); color:var(--ink2)}
+.starchip.on{background:var(--accent-soft); color:var(--accent-deep)}
+.pbrow .pbstar{color:var(--accent); margin-right:.15rem}
+
 /* unscramble */
 .buildrow{min-height:3.2rem; display:flex; flex-wrap:wrap; gap:.45rem; border-bottom:2px solid var(--line); padding-bottom:.6rem}
 .bank{display:flex; flex-wrap:wrap; gap:.45rem}
@@ -525,6 +530,9 @@ home:'<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"
 book:'<svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h14"/></svg>',
 gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8"/></svg>'};
 const TONE='<span class="tonelegend">tones: a mid &nbsp;·&nbsp; à low &nbsp;·&nbsp; â falling &nbsp;·&nbsp; á high &nbsp;·&nbsp; ǎ rising</span>';
+function isStar(id){return !!(S.ph[id]&&S.ph[id].star);}
+function starChip(id){const on=isStar(id);return '<button class="starchip'+(on?" on":"")+'" data-star="'+id+'">'+(on?"★ In frequent review":"☆ Review often")+'</button>';}
+function wireStars(root){root.querySelectorAll("[data-star]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const id=+b.dataset.star;const st=P(id);st.star=!st.star;if(st.star&&st.due>addDays(todayStr(),2))st.due=addDays(todayStr(),2);save();b.classList.toggle("on",st.star);b.textContent=st.star?"★ In frequent review":"☆ Review often";}));}
 function audioBtns(th,big){return '<div class="audiobtns"><button class="audiobtn'+(big?' big':'')+'" data-say="'+esc(th)+'">'+ICO.play+'Listen</button><button class="audiobtn'+(big?' big':'')+'" data-say="'+esc(th)+'" data-slow="1">'+ICO.play+'Slow</button></div>';}
 function wireAudio(root){root.querySelectorAll("[data-say]").forEach(b=>b.addEventListener("click",()=>speak(b.dataset.say,b.dataset.slow==="1")));}
 function navBar(cur){return '<nav class="nav"><div class="inner">'+[["home","Home",ICO.home],["book","Phrasebook",ICO.book],["gear","Settings",ICO.gear]].map(x=>'<button data-nav="'+x[0]+'" class="'+(cur===x[0]?"on":"")+'">'+x[2]+x[1]+'</button>').join("")+'</div></nav>';}
@@ -592,7 +600,7 @@ if(it.teach){
   const st=P(it.id);st.intro=true;st.lv=0;st.due=todayStr();save();
   app.innerHTML='<div class="fullview">'+top
   +'<div class="teach"><span class="newtag">New phrase</span><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'
-  +audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+TONE+'</div>'
+  +audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+starChip(it.id)+TONE+'</div>'
   +'<button class="checkbtn" id="cont">Got it</button></div>';
   wireCommon();speak(p.th,false);
   document.getElementById("cont").addEventListener("click",()=>{SES.i++;renderStep();});
@@ -630,9 +638,11 @@ app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
   app.querySelectorAll(".opt").forEach(o=>{o.disabled=true;if(o.dataset.ok==="1")o.classList.add("right");});
   if(!ok)b.classList.add("wrong");
   grade(it,ok);
-  document.getElementById("fb").innerHTML=ok
+  document.getElementById("fb").innerHTML=(ok
     ?'<div class="feedback good">ถูกต้อง! Correct — <span class="fbrom">'+esc(p.rom)+'</span></div>'
-    :'<div class="feedback bad">Not quite. It’s <span class="fbrom">'+esc(p.rom)+'</span> — '+esc(p.en)+'</div>';
+    :'<div class="feedback bad">Not quite. It’s <span class="fbrom">'+esc(p.rom)+'</span> — '+esc(p.en)+'</div>')
+    +'<div style="margin-top:.55rem">'+starChip(p.id)+'</div>';
+  wireStars(document.getElementById("fb"));
   speak(p.th,false);
   const c=document.getElementById("cont");c.disabled=false;c.focus();
 }));
@@ -657,7 +667,9 @@ cont.addEventListener("click",()=>{
   if(!checked){checked=true;
     const ans=built.map(k=>bank[k].i).join(",");const ok=ans===toks.map((_,i)=>i).join(",");
     grade(it,ok);
-    document.getElementById("fb").innerHTML=ok?'<div class="feedback good">ถูกต้อง! Correct!</div>':'<div class="feedback bad">It’s: <span class="fbrom">'+esc(toks.join(" "))+'</span></div>';
+    document.getElementById("fb").innerHTML=(ok?'<div class="feedback good">ถูกต้อง! Correct!</div>':'<div class="feedback bad">It’s: <span class="fbrom">'+esc(toks.join(" "))+'</span></div>')
+    +'<div style="margin-top:.55rem">'+starChip(p.id)+'</div>';
+    wireStars(document.getElementById("fb"));
     speak(p.th,false);cont.textContent="Continue";
   }else{SES.i++;renderStep();}
 });
@@ -665,7 +677,7 @@ cont.addEventListener("click",()=>{
 function grade(it,ok){
 const st=P(it.id);
 if(!it.redo){
-  if(ok){SES.right++;st.lv=Math.min(7,st.lv+1);st.due=addDays(todayStr(),INTERVALS[st.lv]);}
+  if(ok){SES.right++;st.lv=Math.min(7,st.lv+1);st.due=addDays(todayStr(),st.star?Math.min(INTERVALS[st.lv],2):INTERVALS[st.lv]);}
   else{SES.wrong++;st.lv=Math.max(0,st.lv-2);st.due=addDays(todayStr(),1);SES.redos.push({id:it.id,q:1,redo:1});}
 }else if(!ok){SES.redos.push({id:it.id,q:1,redo:1});}
 save();
@@ -681,7 +693,7 @@ app.innerHTML='<div class="fullview"><div class="finish"><div class="bigth">เ�
 +'</div><button class="checkbtn" id="cont">Back home</button></div>';
 document.getElementById("cont").addEventListener("click",renderHome);
 }
-function wireCommon(){wireAudio(app);const q=document.getElementById("quit");if(q)q.addEventListener("click",renderHome);}
+function wireCommon(){wireAudio(app);wireStars(app);const q=document.getElementById("quit");if(q)q.addEventListener("click",renderHome);}
 
 /* ---------- dialogue ---------- */
 function startDialogue(u,fromSession){
@@ -752,11 +764,14 @@ step();
 function renderBook(filter){
 filter=(filter||"").toLowerCase();
 let rows="";
+function rowHtml(p){const st=S.ph[p.id];const cls=st&&st.intro?(st.lv>=4?"l2":"l1"):"";
+  return '<button class="pbrow" data-id="'+p.id+'"><span><span class="pben">'+(isStar(p.id)?'<span class="pbstar">★</span>':"")+esc(p.en)+'</span><br><span class="pbrom">'+esc(p.rom)+'</span></span><span class="lvl '+cls+'"></span></button>';}
+const starred=PHRASES.filter(p=>isStar(p.id)&&(!filter||p.en.toLowerCase().includes(filter)||p.rom.toLowerCase().includes(filter)));
+if(starred.length)rows+='<div class="pbunit" style="color:var(--accent-deep)">★ Frequent review</div>'+starred.map(rowHtml).join("");
 UNITS.forEach((u,ui)=>{
   const ps=PHRASES.filter(p=>p.u===ui&&(!filter||p.en.toLowerCase().includes(filter)||p.rom.toLowerCase().includes(filter)));
   if(!ps.length)return;
-  rows+='<div class="pbunit">'+u.g+' '+esc(u.n)+'</div>'+ps.map(p=>{const st=S.ph[p.id];const cls=st&&st.intro?(st.lv>=4?"l2":"l1"):"";
-  return '<button class="pbrow" data-id="'+p.id+'"><span><span class="pben">'+esc(p.en)+'</span><br><span class="pbrom">'+esc(p.rom)+'</span></span><span class="lvl '+cls+'"></span></button>';}).join("");
+  rows+='<div class="pbunit">'+u.g+' '+esc(u.n)+'</div>'+ps.map(rowHtml).join("");
 });
 app.innerHTML='<div class="view"><div class="topbar"><div class="brand"><span class="th">สวัสดี</span>Phrasebook</div></div>'
 +'<div class="searchrow"><input id="q" type="search" placeholder="Search English or Thai sounds…" value="'+esc(filter)+'"></div>'
@@ -769,9 +784,9 @@ app.querySelectorAll("[data-id]").forEach(b=>b.addEventListener("click",()=>show
 function showPhrase(id,back){
 const p=PHRASES[id];
 const ov=document.createElement("div");ov.className="overlay";
-ov.innerHTML='<div class="sheet"><div class="handle"></div><div class="teach" style="border:none;padding:0;background:none"><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+TONE+'</div></div>';
-document.body.appendChild(ov);wireAudio(ov);speak(p.th,false);
-ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
+ov.innerHTML='<div class="sheet"><div class="handle"></div><div class="teach" style="border:none;padding:0;background:none"><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+starChip(p.id)+TONE+'</div></div>';
+document.body.appendChild(ov);wireAudio(ov);wireStars(ov);speak(p.th,false);
+ov.addEventListener("click",e=>{if(e.target===ov){ov.remove();if(back)back();}});
 }
 
 /* ---------- settings ---------- */
