@@ -1,0 +1,819 @@
+<meta charset="utf-8">
+<title>Sawatdee</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@600;700;800&family=Sarabun:wght@400;500;600;700&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F2F5F1; --surface:#FFFFFF; --surface2:#E9EFE8; --ink:#22302B; --ink2:#5F6F67;
+  --line:#DCE4DB; --accent:#D98E1B; --accent-deep:#B36F07; --accent-ink:#3A2704;
+  --accent-soft:#F6ECD6; --hero1:#E9A63A; --hero2:#C97B10;
+  --good:#3E8E5A; --good-soft:#E2F0E6; --bad:#C4574E; --bad-soft:#F8E4E1;
+  --chip:#E9EFE8; --shadow:0 6px 24px rgba(34,48,43,.08);
+  --font-d:'K2D','Sarabun',system-ui,sans-serif;
+  --font-ui:'Sarabun',system-ui,sans-serif;
+  --font-w:'Noto Sans','Noto Sans Thai',system-ui,sans-serif;
+  --font-th:'Noto Sans Thai','Noto Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141B18; --surface:#1D2622; --surface2:#26302B; --ink:#E7EDE8; --ink2:#96A69D;
+    --line:#2E3A34; --accent:#E9A94B; --accent-deep:#F0BC6C; --accent-ink:#2A1D03;
+    --accent-soft:#382C14; --hero1:#D9962B; --hero2:#A8650B;
+    --good:#5FB380; --good-soft:#20342A; --bad:#DD7A6F; --bad-soft:#3D2523;
+    --chip:#26302B; --shadow:0 6px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141B18; --surface:#1D2622; --surface2:#26302B; --ink:#E7EDE8; --ink2:#96A69D;
+  --line:#2E3A34; --accent:#E9A94B; --accent-deep:#F0BC6C; --accent-ink:#2A1D03;
+  --accent-soft:#382C14; --hero1:#D9962B; --hero2:#A8650B;
+  --good:#5FB380; --good-soft:#20342A; --bad:#DD7A6F; --bad-soft:#3D2523;
+  --chip:#26302B; --shadow:0 6px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--bg); color:var(--ink); font-family:var(--font-ui); font-size:16px; line-height:1.5;}
+button{font-family:inherit; color:inherit; border:none; background:none; cursor:pointer; padding:0}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent); outline-offset:2px; border-radius:6px}
+input,select{font-family:inherit; font-size:1rem; color:var(--ink); background:var(--surface); border:1.5px solid var(--line); border-radius:12px; padding:.65rem .8rem; width:100%}
+textarea{font-family:monospace; font-size:.8rem; color:var(--ink); background:var(--surface); border:1.5px solid var(--line); border-radius:12px; padding:.65rem .8rem; width:100%; min-height:7rem}
+h1,h2,h3{font-family:var(--font-d); line-height:1.15; margin:0; text-wrap:balance}
+.app{max-width:30rem; margin:0 auto; min-height:100vh; min-height:100dvh; display:flex; flex-direction:column}
+.view{flex:1; padding:1.1rem 1.1rem 6rem; display:flex; flex-direction:column; gap:1rem}
+.fullview{flex:1; padding:1rem 1.1rem 1.5rem; display:flex; flex-direction:column; gap:1rem}
+
+/* top bar */
+.topbar{display:flex; align-items:baseline; justify-content:space-between; gap:.75rem; padding:.4rem 0 .1rem}
+.brand{font-family:var(--font-d); font-weight:800; font-size:1.25rem; letter-spacing:.01em}
+.brand .th{font-family:var(--font-th); font-weight:600; color:var(--accent); margin-right:.35rem}
+.streakchip{font-size:.8rem; font-weight:700; background:var(--chip); border-radius:999px; padding:.25rem .7rem; color:var(--ink2)}
+.streakchip.hot{background:var(--accent-soft); color:var(--accent-deep)}
+
+/* hero */
+.hero{background:linear-gradient(135deg,var(--hero1),var(--hero2)); color:var(--accent-ink); border-radius:20px; padding:1.25rem 1.25rem 1.35rem; position:relative; overflow:hidden; box-shadow:var(--shadow)}
+.hero .mark{position:absolute; right:-.4rem; top:-2.4rem; font-family:var(--font-th); font-size:9rem; line-height:1; opacity:.14; pointer-events:none; user-select:none}
+.hero .kicker{font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.14em; opacity:.75}
+.hero h1{font-size:2rem; font-weight:800; margin:.15rem 0 .1rem}
+.hero .sub{font-size:.9rem; font-weight:600; opacity:.85; margin-bottom:1rem}
+.bigbtn{display:block; width:100%; text-align:center; background:var(--accent-ink); color:#F6E9CF; font-family:var(--font-d); font-weight:700; font-size:1.05rem; padding:.85rem 1rem; border-radius:14px; transition:transform .1s}
+.bigbtn:active{transform:scale(.98)}
+.hero .counts{display:flex; gap:1rem; margin-top:.7rem; font-size:.82rem; font-weight:600; opacity:.85}
+
+/* cards & sections */
+.card{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:1rem 1.1rem}
+.sectionlabel{font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.14em; color:var(--ink2); margin:.4rem 0 -.3rem}
+.progressbar{height:8px; background:var(--surface2); border-radius:99px; overflow:hidden}
+.progressbar i{display:block; height:100%; background:var(--accent); border-radius:99px; transition:width .4s}
+.pacenote{font-size:.82rem; color:var(--ink2); margin-top:.45rem}
+.pacenote b{color:var(--good)}
+.pacenote b.behind{color:var(--accent-deep)}
+
+/* unit rows */
+.unitrow{display:flex; align-items:center; gap:.9rem; width:100%; text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:.8rem .95rem}
+.unitrow.active{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+.unitrow .thglyph{font-family:var(--font-th); font-size:1.5rem; color:var(--accent); width:2.4rem; flex-shrink:0; text-align:center}
+.unitrow .uinfo{flex:1; min-width:0}
+.unitrow .uname{font-weight:700; font-size:.95rem}
+.unitrow .usub{font-size:.78rem; color:var(--ink2)}
+.unitrow .uprog{font-size:.78rem; font-weight:700; color:var(--ink2); font-variant-numeric:tabular-nums; flex-shrink:0}
+.unitrow .uprog.done{color:var(--good)}
+.dlgchip{display:inline-block; font-size:.72rem; font-weight:700; background:var(--accent-soft); color:var(--accent-deep); border-radius:999px; padding:.1rem .55rem; margin-top:.15rem}
+.dlgchip.done{background:var(--good-soft); color:var(--good)}
+
+/* bottom nav */
+.nav{position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--line); display:flex; justify-content:center; z-index:20; padding-bottom:env(safe-area-inset-bottom)}
+.nav .inner{display:flex; width:100%; max-width:30rem}
+.nav button{flex:1; display:flex; flex-direction:column; align-items:center; gap:.15rem; padding:.55rem 0 .6rem; font-size:.68rem; font-weight:700; color:var(--ink2)}
+.nav button.on{color:var(--accent-deep)}
+.nav svg{width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+
+/* session */
+.sesstop{display:flex; align-items:center; gap:.8rem}
+.sesstop .x{font-size:1.5rem; color:var(--ink2); padding:.2rem .5rem}
+.sesstop .progressbar{flex:1}
+.exwrap{flex:1; display:flex; flex-direction:column; gap:1rem; justify-content:flex-start; padding-top:.5rem}
+.exprompt{font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--ink2)}
+.exq{font-family:var(--font-d); font-size:1.35rem; font-weight:700; line-height:1.3}
+.exq .th{font-family:var(--font-th); font-weight:500}
+.opts{display:flex; flex-direction:column; gap:.6rem}
+.opt{display:block; width:100%; text-align:left; background:var(--surface); border:1.5px solid var(--line); border-radius:14px; padding:.75rem .95rem; font-size:1rem; transition:border-color .12s}
+.opt .rom{font-family:var(--font-w); font-weight:600; font-size:1.02rem}
+.opt .sub{font-size:.8rem; color:var(--ink2); font-family:var(--font-th)}
+.opt.sel{border-color:var(--accent)}
+.opt.right{border-color:var(--good); background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad); background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.audiobtns{display:flex; gap:.6rem}
+.audiobtn{display:flex; align-items:center; gap:.45rem; background:var(--accent-soft); color:var(--accent-deep); font-weight:700; font-size:.9rem; border-radius:999px; padding:.55rem 1.05rem}
+.audiobtn svg{width:18px; height:18px; fill:currentColor}
+.audiobtn.big{font-size:1rem; padding:.7rem 1.3rem}
+.feedback{border-radius:14px; padding:.8rem 1rem; font-weight:600; font-size:.95rem}
+.feedback.good{background:var(--good-soft); color:var(--good)}
+.feedback.bad{background:var(--bad-soft); color:var(--bad)}
+.feedback .fbrom{font-family:var(--font-w)}
+.checkbtn{display:block; width:100%; text-align:center; background:var(--accent); color:var(--accent-ink); font-family:var(--font-d); font-weight:700; font-size:1.05rem; padding:.9rem 1rem; border-radius:14px; margin-top:auto}
+.checkbtn:disabled{opacity:.4; cursor:default}
+.checkbtn.secondary{background:var(--surface2); color:var(--ink)}
+
+/* teach card */
+.teach{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:1.4rem 1.2rem; display:flex; flex-direction:column; gap:.55rem; align-items:flex-start}
+.teach .newtag{font-size:.7rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; background:var(--accent-soft); color:var(--accent-deep); border-radius:999px; padding:.2rem .6rem}
+.teach .en{font-size:1rem; font-weight:600; color:var(--ink2)}
+.teach .rom{font-family:var(--font-w); font-size:1.7rem; font-weight:700; line-height:1.25}
+.teach .th{font-family:var(--font-th); font-size:1.35rem; color:var(--accent-deep)}
+.teach .note{font-size:.85rem; color:var(--ink2); background:var(--surface2); border-radius:10px; padding:.55rem .75rem; margin-top:.3rem}
+.tonelegend{font-size:.72rem; color:var(--ink2); margin-top:.4rem; font-family:var(--font-w)}
+
+/* unscramble */
+.buildrow{min-height:3.2rem; display:flex; flex-wrap:wrap; gap:.45rem; border-bottom:2px solid var(--line); padding-bottom:.6rem}
+.bank{display:flex; flex-wrap:wrap; gap:.45rem}
+.chiptok{font-family:var(--font-w); font-weight:600; font-size:1rem; background:var(--surface); border:1.5px solid var(--line); border-radius:10px; padding:.45rem .7rem}
+.chiptok.used{opacity:.25; pointer-events:none}
+.buildrow .chiptok{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-deep)}
+
+/* dialogue */
+.bubbles{display:flex; flex-direction:column; gap:.7rem}
+.bubble{max-width:88%; border-radius:16px; padding:.7rem .95rem; font-size:.95rem}
+.bubble.npc{background:var(--surface); border:1px solid var(--line); align-self:flex-start; border-bottom-left-radius:4px}
+.bubble.me{background:var(--accent-soft); color:var(--accent-deep); align-self:flex-end; border-bottom-right-radius:4px}
+.bubble .bth{font-family:var(--font-th); font-size:1.05rem}
+.bubble .brom{font-family:var(--font-w); font-weight:600}
+.bubble .ben{font-size:.78rem; color:var(--ink2); margin-top:.15rem}
+.bubble.me .ben{color:var(--accent-deep); opacity:.75}
+.speaker{font-size:.72rem; font-weight:700; color:var(--ink2); margin-bottom:-.4rem}
+
+/* phrasebook */
+.searchrow input{border-radius:999px; padding:.6rem 1.1rem}
+.pbunit{font-family:var(--font-d); font-weight:700; font-size:1rem; margin:.6rem 0 .2rem}
+.pbrow{display:flex; align-items:center; gap:.7rem; width:100%; text-align:left; padding:.6rem .2rem; border-bottom:1px solid var(--line)}
+.pbrow .pben{font-weight:600; font-size:.92rem}
+.pbrow .pbrom{font-family:var(--font-w); font-size:.85rem; color:var(--ink2)}
+.pbrow .lvl{margin-left:auto; flex-shrink:0; width:8px; height:8px; border-radius:99px; background:var(--line)}
+.pbrow .lvl.l1{background:var(--accent)} .pbrow .lvl.l2{background:var(--good)}
+
+/* modal */
+.overlay{position:fixed; inset:0; background:rgba(10,14,12,.45); z-index:40; display:flex; align-items:flex-end; justify-content:center}
+.sheet{background:var(--bg); width:100%; max-width:30rem; border-radius:22px 22px 0 0; padding:1.2rem 1.2rem 2rem; max-height:85vh; overflow-y:auto}
+.sheet .handle{width:38px; height:4px; border-radius:99px; background:var(--line); margin:0 auto .9rem}
+
+/* settings */
+.setrow{display:flex; flex-direction:column; gap:.35rem}
+.setrow label{font-size:.82rem; font-weight:700; color:var(--ink2)}
+.btnrow{display:flex; gap:.6rem}
+.smallbtn{background:var(--surface2); font-weight:700; font-size:.88rem; border-radius:12px; padding:.6rem 1rem}
+.smallbtn.warn{color:var(--bad)}
+.notice{font-size:.82rem; color:var(--ink2)}
+.ttsbanner{background:var(--bad-soft); color:var(--bad); font-size:.85rem; font-weight:600; border-radius:12px; padding:.7rem .9rem}
+
+/* stats + finish */
+.statgrid{display:grid; grid-template-columns:1fr 1fr; gap:.7rem}
+.stat{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:.8rem .95rem}
+.stat .n{font-family:var(--font-d); font-size:1.6rem; font-weight:800; font-variant-numeric:tabular-nums}
+.stat .l{font-size:.75rem; font-weight:700; color:var(--ink2); text-transform:uppercase; letter-spacing:.1em}
+.finish{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; text-align:center}
+.finish .bigth{font-family:var(--font-th); font-size:3rem; color:var(--accent)}
+.finish h2{font-size:1.5rem}
+.finish p{color:var(--ink2); margin:0}
+
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+</style>
+<div class="app" id="app"></div>
+<script>
+"use strict";
+const UNITS=[
+{n:"Greetings & Politeness",th:"ทักทาย",g:"๑",d:"Hello, thank you, sorry — and the wai"},
+{n:"Numbers & Money",th:"ตัวเลข",g:"๒",d:"Count, pay, and bargain in baht"},
+{n:"Food & Drink",th:"อาหาร",g:"๓",d:"Order like you grew up here"},
+{n:"Getting Around",th:"เดินทาง",g:"๔",d:"Taxis, tuk-tuks, and the BTS"},
+{n:"Shopping",th:"ซื้อของ",g:"๕",d:"Markets and the gentle art of the discount"},
+{n:"Directions & Time",th:"ถามทาง",g:"๖",d:"Find your way — and tell the time"},
+{n:"Health & Emergencies",th:"ฉุกเฉิน",g:"๗",d:"Pharmacy runs and lost passports"},
+{n:"Small Talk",th:"คุยเล่น",g:"๘",d:"Make friends, give compliments, be sà-baai"}
+];
+// [english, thai, romanization, note?, placement?]
+const RAW=[
+[
+["Hello","สวัสดีค่ะ","sà-wàt-dii khâ","Works any time of day, for hello or goodbye. Pair it with a wai — palms together, slight bow.",1],
+["Thank you","ขอบคุณค่ะ","khàawp-khun khâ","",1],
+["Thank you so much","ขอบคุณมากค่ะ","khàawp-khun mâak khâ"],
+["How are you?","สบายดีไหมคะ","sà-baai-dii mǎi khá","As a female speaker, end questions with khá (high tone) and statements with khâ (falling)."],
+["I'm fine","สบายดีค่ะ","sà-baai-dii khâ"],
+["And you?","แล้วคุณล่ะคะ","láaeo khun lâ khá"],
+["What's your name?","คุณชื่ออะไรคะ","khun chûue à-rai khá"],
+["My name is…","ฉันชื่อ...","chǎn chûue …","chǎn is \"I\" for female speakers."],
+["Nice to meet you","ยินดีที่ได้รู้จักค่ะ","yin-dii thîi dâai rúu-jàk khâ"],
+["Goodbye","ลาก่อนค่ะ","laa-gàawn khâ","sà-wàt-dii khâ also works perfectly as goodbye."],
+["See you later","แล้วเจอกันค่ะ","láaeo jooe gan khâ"],
+["Yes","ใช่ค่ะ","châi khâ","Often a simple \"khâ\" on its own means yes."],
+["No","ไม่ใช่ค่ะ","mâi châi khâ"],
+["Excuse me / I'm sorry","ขอโทษค่ะ","khǎaw-thôot khâ","Also how you politely get someone's attention — a waiter, a passerby."],
+["It's okay / no worries","ไม่เป็นไรค่ะ","mâi bpen rai khâ","The most Thai phrase there is — easy-going, forgiving, everything's fine.",1],
+["You're welcome","ยินดีค่ะ","yin-dii khâ"],
+["I speak a little Thai","พูดไทยได้นิดหน่อยค่ะ","phûut thai dâai nít-nàwy khâ"],
+["Do you speak English?","พูดภาษาอังกฤษได้ไหมคะ","phûut phaa-sǎa ang-grìt dâai mǎi khá"],
+["I don't understand","ไม่เข้าใจค่ะ","mâi khâo-jai khâ"],
+["I understand","เข้าใจค่ะ","khâo-jai khâ"],
+["Can you say that again?","พูดอีกครั้งได้ไหมคะ","phûut ìik khráng dâai mǎi khá"],
+["Please speak slowly","พูดช้าๆ หน่อยค่ะ","phûut cháa-cháa nàwy khâ"],
+["What does that mean?","แปลว่าอะไรคะ","bplaae wâa à-rai khá"],
+["Where are you from?","คุณมาจากไหนคะ","khun maa jàak nǎi khá"],
+["I'm from America","ฉันมาจากอเมริกาค่ะ","chǎn maa jàak à-mee-rí-gaa khâ"],
+["I'm here on vacation","มาเที่ยวค่ะ","maa thîao khâ"],
+["Good luck","โชคดีค่ะ","chôok-dii khâ","A warm way to part with someone."],
+["Sweet dreams","ฝันดีค่ะ","fǎn-dii khâ","Literally \"dream well\" — the cozy goodnight."]
+],[
+["one","หนึ่ง","nùeng"],
+["two","สอง","sǎawng"],
+["three","สาม","sǎam"],
+["four","สี่","sìi"],
+["five","ห้า","hâa","\"555\" in Thai texting = hâa hâa hâa = hahaha.",1],
+["six","หก","hòk"],
+["seven","เจ็ด","jèt"],
+["eight","แปด","bpàaet"],
+["nine","เก้า","gâo"],
+["ten","สิบ","sìp","",1],
+["eleven","สิบเอ็ด","sìp-èt","-èt is only for the trailing 1: 11, 21, 31…"],
+["twenty","ยี่สิบ","yîi-sìp"],
+["fifty","ห้าสิบ","hâa-sìp"],
+["one hundred","หนึ่งร้อย","nùeng ráawy"],
+["five hundred","ห้าร้อย","hâa ráawy"],
+["one thousand","หนึ่งพัน","nùeng phan"],
+["How much?","เท่าไหร่คะ","thâo-rài khá","",1],
+["How much is this?","อันนี้เท่าไหร่คะ","an-níi thâo-rài khá"],
+["baht","บาท","bàat"],
+["expensive","แพง","phaaeng"],
+["Too expensive!","แพงไปค่ะ","phaaeng bpai khâ","Say it with a smile — it's the opening move, not an insult."],
+["cheap","ถูก","thùuk"],
+["Can you lower the price?","ลดได้ไหมคะ","lót dâai mǎi khá","Bargaining at markets is a friendly sport, not a confrontation."],
+["money","เงิน","ngoen"],
+["Do you take cards?","รับบัตรไหมคะ","ráp bàt mǎi khá"],
+["I'll pay cash","จ่ายเงินสดค่ะ","jàai ngoen-sòt khâ"],
+["Where's an ATM?","ตู้เอทีเอ็มอยู่ไหนคะ","dtûu ee-thii-em yùu nǎi khá"],
+["change (money back)","เงินทอน","ngoen thaawn"],
+["free (no charge)","ฟรี","frii"],
+["How many?","กี่อันคะ","gìi an khá"]
+],[
+["Can I have… (ordering)","ขอ...","khǎaw …","The magic word: khǎaw + thing + khâ politely orders anything."],
+["water","น้ำ","náam","",1],
+["Can I have water?","ขอน้ำค่ะ","khǎaw náam khâ"],
+["ice","น้ำแข็ง","náam-khǎeng"],
+["rice","ข้าว","khâao","",1],
+["chicken","ไก่","gài","",1],
+["pork","หมู","mǔu"],
+["beef","เนื้อ","núea"],
+["shrimp","กุ้ง","gûng"],
+["fish","ปลา","bplaa"],
+["vegetables","ผัก","phàk"],
+["egg","ไข่","khài"],
+["noodles","ก๋วยเตี๋ยว","gǔai-dtǐao"],
+["pad thai","ผัดไทย","phàt-thai"],
+["fried rice","ข้าวผัด","khâao-phàt"],
+["green curry","แกงเขียวหวาน","gaaeng khǐao-wǎan"],
+["papaya salad","ส้มตำ","sôm-dtam","Ask for phèt nít-nàwy unless you mean business."],
+["mango sticky rice","ข้าวเหนียวมะม่วง","khâao-nǐao má-mûang"],
+["delicious","อร่อย","à-ràwy","",1],
+["It's really delicious","อร่อยมากค่ะ","à-ràwy mâak khâ","Cooks light up when you say this."],
+["spicy","เผ็ด","phèt","",1],
+["not spicy, please","ไม่เผ็ดค่ะ","mâi phèt khâ"],
+["just a little spicy","เผ็ดนิดหน่อยค่ะ","phèt nít-nàwy khâ"],
+["I can't eat spicy food","กินเผ็ดไม่ได้ค่ะ","gin phèt mâi dâai khâ"],
+["no sugar","ไม่ใส่น้ำตาล","mâi sài náam-dtaan","Handy for drinks — Thai default is sweet."],
+["no cilantro","ไม่ใส่ผักชี","mâi sài phàk-chii"],
+["I'm allergic to peanuts","ฉันแพ้ถั่วลิสงค่ะ","chǎn pháae thùa-lí-sǒng khâ"],
+["I'm allergic to seafood","ฉันแพ้อาหารทะเลค่ะ","chǎn pháae aa-hǎan thá-lee khâ"],
+["I'm vegetarian","ฉันกินเจค่ะ","chǎn gin jee khâ"],
+["Can I see the menu?","ขอเมนูหน่อยค่ะ","khǎaw mee-nuu nàwy khâ"],
+["Check, please","เช็คบิลค่ะ","chék-bin khâ","Works everywhere, from street stalls to restaurants."],
+["coffee","กาแฟ","gaa-faae"],
+["iced coffee","กาแฟเย็น","gaa-faae yen"],
+["Thai iced tea","ชาเย็น","chaa-yen"],
+["beer","เบียร์","bia"],
+["coconut water","น้ำมะพร้าว","náam má-phráao"],
+["One more, please","ขออีกหนึ่งค่ะ","khǎaw ìik nùeng khâ"],
+["I'm full","อิ่มแล้วค่ะ","ìm láaeo khâ"],
+["I'm hungry","หิวข้าวค่ะ","hǐu khâao khâ","Literally \"hungry for rice.\""],
+["take-away, please","ขอใส่กล่องค่ะ","khǎaw sài glàwng khâ","Literally \"put it in a box, please.\""]
+],[
+["taxi","แท็กซี่","tháek-sîi"],
+["Go to…, please","ไป ... ค่ะ","bpai … khâ","bpai + destination + khâ is all a driver needs.",1],
+["airport","สนามบิน","sà-nǎam-bin"],
+["Go to the airport, please","ไปสนามบินค่ะ","bpai sà-nǎam-bin khâ"],
+["hotel","โรงแรม","roong-raaem"],
+["Go to the hotel, please","ไปโรงแรมค่ะ","bpai roong-raaem khâ"],
+["train station","สถานีรถไฟ","sà-thǎa-nii rót-fai"],
+["bus","รถเมล์","rót-mee"],
+["skytrain (BTS)","รถไฟฟ้า","rót-fai-fáa","Literally \"electric train.\""],
+["boat","เรือ","ruea"],
+["tuk-tuk","ตุ๊กตุ๊ก","dtúk-dtúk","Agree on the fare before you get in."],
+["motorbike taxi","มอเตอร์ไซค์","maw-dtooe-sai"],
+["Please turn on the meter","เปิดมิเตอร์ด้วยค่ะ","bpòoet mí-dtooe dûai khâ","The essential Bangkok taxi phrase."],
+["Stop here","จอดตรงนี้ค่ะ","jàawt dtrong-níi khâ"],
+["Turn left","เลี้ยวซ้าย","líao sáai"],
+["Turn right","เลี้ยวขวา","líao khwǎa"],
+["Go straight","ตรงไป","dtrong bpai"],
+["Slowly, please","ช้าๆ หน่อยค่ะ","cháa-cháa nàwy khâ"],
+["Does it take long?","ใช้เวลานานไหมคะ","chái wee-laa naan mǎi khá"],
+["far","ไกล","glai","glai (mid tone) = far. glâi (falling) = near. Same letters, opposite meanings — all in the tone!",1],
+["near","ใกล้","glâi"],
+["I want to go to…","อยากไป...","yàak bpai …"],
+["Where do I buy tickets?","ซื้อตั๋วที่ไหนคะ","súue dtǔa thîi-nǎi khá"],
+["ticket","ตั๋ว","dtǔa"],
+["What time does it leave?","ออกกี่โมงคะ","àawk gìi moong khá"],
+["Just a moment","รอสักครู่ค่ะ","raaw sàk-khrûu khâ"]
+],[
+["I'm just looking","ดูเฉยๆ ค่ะ","duu chǒoei-chǒoei khâ"],
+["Do you have…?","มี ... ไหมคะ","mii … mǎi khá"],
+["Do you have another color?","มีสีอื่นไหมคะ","mii sǐi ùuen mǎi khá"],
+["Do you have a bigger one?","มีใหญ่กว่านี้ไหมคะ","mii yài gwàa níi mǎi khá"],
+["smaller than this","เล็กกว่านี้","lék gwàa níi"],
+["Can I try it on?","ลองได้ไหมคะ","laawng dâai mǎi khá"],
+["I like it","ชอบค่ะ","châawp khâ"],
+["I don't like it","ไม่ชอบค่ะ","mâi châawp khâ"],
+["I'll take this one","เอาอันนี้ค่ะ","ao an-níi khâ"],
+["I'll take two","เอาสองอันค่ะ","ao sǎawng an khâ"],
+["What is this?","นี่อะไรคะ","nîi à-rai khá"],
+["beautiful","สวย","sǔai","sǔai (rising) = beautiful. Flat suai = unlucky. Mind the tone when compliments are involved!",1],
+["market","ตลาด","dtà-làat","",1],
+["night market","ตลาดนัด","dtà-làat nát"],
+["souvenirs","ของฝาก","khǎawng-fàak","Literally \"things you leave with people\" — gifts you bring home."],
+["Can you wrap it?","ห่อให้หน่อยได้ไหมคะ","hàaw hâi nàwy dâai mǎi khá"],
+["bag","ถุง","thǔng"],
+["No bag, thanks","ไม่เอาถุงค่ะ","mâi ao thǔng khâ"],
+["discount","ลดราคา","lót raa-khaa"],
+["What's your best price?","ราคาสุดท้ายเท่าไหร่คะ","raa-khaa sùt-tháai thâo-rài khá","Literally \"what's the final price?\" — the closing move."],
+["clothes","เสื้อผ้า","sûuea-phâa"],
+["shirt","เสื้อ","sûuea"],
+["pants","กางเกง","gaang-geeng"],
+["shoes","รองเท้า","raawng-tháo"],
+["small / big","เล็ก / ใหญ่","lék / yài"],
+["this one / that one","อันนี้ / อันนั้น","an-níi / an-nán"]
+],[
+["Where is…?","... อยู่ที่ไหนคะ","… yùu thîi-nǎi khá"],
+["Where's the bathroom?","ห้องน้ำอยู่ที่ไหนคะ","hâwng-náam yùu thîi-nǎi khá","Quite possibly the most useful sentence in Thailand.",1],
+["here","ที่นี่","thîi-nîi"],
+["there","ที่นั่น","thîi-nân"],
+["left / right","ซ้าย / ขวา","sáai / khwǎa"],
+["opposite / across from","ตรงข้าม","dtrong-khâam"],
+["Is it far?","ไกลไหมคะ","glai mǎi khá"],
+["Can I walk there?","เดินไปได้ไหมคะ","dooen bpai dâai mǎi khá"],
+["street","ถนน","thà-nǒn"],
+["alley (soi)","ซอย","saawy","Bangkok addresses live and die by their soi number."],
+["intersection","สี่แยก","sìi-yâaek","Literally \"four-way split.\""],
+["temple","วัด","wát","Cover shoulders and knees; shoes off inside.",1],
+["beach","ชายหาด","chaai-hàat"],
+["island","เกาะ","gàw","Koh Samui, Koh Chang — that \"Koh\" is gàw.",1],
+["7-Eleven","เซเว่น","see-wên","What everyone actually calls it. You will say this daily."],
+["restaurant","ร้านอาหาร","ráan aa-hǎan"],
+["I'm lost","หลงทางค่ะ","lǒng thaang khâ"],
+["Can you show me on the map?","ช่วยชี้แผนที่ให้หน่อยค่ะ","chûai chíi phǎaen-thîi hâi nàwy khâ"],
+["What time does it open?","เปิดกี่โมงคะ","bpòoet gìi moong khá"],
+["What time does it close?","ปิดกี่โมงคะ","bpìt gìi moong khá","bpòoet = open, bpìt = close. A one-vowel difference worth drilling."],
+["today","วันนี้","wan-níi"],
+["tomorrow","พรุ่งนี้","phrûng-níi"],
+["yesterday","เมื่อวาน","mûuea-waan"],
+["now","ตอนนี้","dtaawn-níi"],
+["What time is it?","กี่โมงแล้วคะ","gìi moong láaeo khá"],
+["morning / evening","เช้า / เย็น","cháao / yen"],
+["room","ห้อง","hâwng"]
+],[
+["Help!","ช่วยด้วย!","chûai dûai!"],
+["Call the police!","เรียกตำรวจ!","rîak dtam-rùat!"],
+["police","ตำรวจ","dtam-rùat"],
+["I need a doctor","อยากไปหาหมอค่ะ","yàak bpai hǎa mǎaw khâ"],
+["hospital","โรงพยาบาล","roong-phá-yaa-baan"],
+["pharmacy","ร้านขายยา","ráan khǎai yaa","Literally \"shop that sells medicine.\""],
+["medicine","ยา","yaa"],
+["I don't feel well","ไม่สบายค่ะ","mâi sà-baai khâ","",1],
+["headache","ปวดหัว","bpùat hǔa"],
+["stomachache","ปวดท้อง","bpùat tháawng"],
+["I have a fever","เป็นไข้ค่ะ","bpen khâi khâ"],
+["It hurts here","เจ็บตรงนี้ค่ะ","jèp dtrong-níi khâ"],
+["mosquito","ยุง","yung"],
+["mosquito repellent","ยากันยุง","yaa gan yung","Literally \"medicine prevent mosquito.\" Pack it; buy more there."],
+["sunscreen","ครีมกันแดด","khriim gan dàaet"],
+["Be careful!","ระวัง!","rá-wang!"],
+["I lost my phone","โทรศัพท์หายค่ะ","thoo-rá-sàp hǎai khâ"],
+["I lost my passport","พาสปอร์ตหายค่ะ","pháat-sà-bpàawt hǎai khâ"],
+["wallet","กระเป๋าตังค์","grà-bpǎo-dtang"],
+["My bag was stolen","กระเป๋าโดนขโมยค่ะ","grà-bpǎo doon khà-mooi khâ"],
+["embassy","สถานทูต","sà-thǎan-thûut"],
+["It's an emergency","ฉุกเฉินค่ะ","chùk-chǒoen khâ"],
+["tissue / toilet paper","ทิชชู่","thít-chûu","Carry some — not every bathroom provides it."],
+["band-aid","พลาสเตอร์","phláat-sà-dtooe"],
+["drinking water","น้ำดื่ม","náam dùuem","Stick to bottled — it's on every 7-Eleven shelf."],
+["doctor","หมอ","mǎaw"],
+["I'm okay","ฉันโอเคค่ะ","chǎn oo-khee khâ"]
+],[
+["Thai food is so delicious","อาหารไทยอร่อยมาก","aa-hǎan thai à-ràwy mâak"],
+["Thailand is beautiful","เมืองไทยสวยมาก","mueang-thai sǔai mâak"],
+["I love Thailand","ฉันรักเมืองไทย","chǎn rák mueang-thai"],
+["I'm so happy","ดีใจมากค่ะ","dii-jai mâak khâ"],
+["This is fun!","สนุกมาก!","sà-nùk mâak!","",1],
+["It's so hot today!","วันนี้ร้อนมาก!","wan-níi ráawn mâak!","Instant friendship with any Thai person.",1],
+["cute","น่ารัก","nâa-rák","",1],
+["Really?","จริงเหรอ","jing rǒoe"],
+["Just kidding","ล้อเล่น","láaw-lên"],
+["What's this called in Thai?","อันนี้ภาษาไทยเรียกว่าอะไรคะ","an-níi phaa-sǎa-thai rîak wâa à-rai khá","Unlocks unlimited free Thai lessons from locals."],
+["I'm learning Thai","ฉันกำลังเรียนภาษาไทยค่ะ","chǎn gam-lang rian phaa-sǎa-thai khâ"],
+["I spoke Thai as a kid","ตอนเด็กฉันพูดไทยได้ค่ะ","dtaawn dèk chǎn phûut thai dâai khâ","Your story! Expect delighted follow-up questions."],
+["my partner","แฟนของฉัน","faaen khǎawng chǎn","faaen covers boyfriend, girlfriend, and spouse — one word for all."],
+["How old are you?","อายุเท่าไหร่คะ","aa-yú thâo-rài khá","A completely normal question in Thailand — don't be startled."],
+["I'm … years old","ฉันอายุ ... ปี","chǎn aa-yú … bpii"],
+["The weather is nice","อากาศดี","aa-gàat dii"],
+["It's raining","ฝนตก","fǒn dtòk"],
+["the sea","ทะเล","thá-lee"],
+["I want to go to the beach","อยากไปทะเลค่ะ","yàak bpai thá-lee khâ"],
+["swim","ว่ายน้ำ","wâai-náam"],
+["Can you take a photo for me?","ถ่ายรูปให้หน่อยได้ไหมคะ","thàai-rûup hâi nàwy dâai mǎi khá"],
+["Can I take a photo?","ถ่ายรูปได้ไหมคะ","thàai-rûup dâai mǎi khá","Polite before photographing people, monks, or inside temples."],
+["tired","เหนื่อย","nùeai"],
+["sleepy","ง่วง","ngûang"],
+["Let's go!","ไปกันเถอะ!","bpai gan thòe!"],
+["Cheers!","ชนแก้ว!","chon gâaeo!","Literally \"clink glasses!\""],
+["so tasty! (Isaan slang)","แซ่บ!","sâaep!","Isaan slang — deploy it over som tam and collect grins."],
+["take it easy / chill","สบายๆ","sà-baai sà-baai","The Thai philosophy in two syllables."],
+["Amazing!","สุดยอด!","sùt-yâawt!","Literally \"the utmost peak!\""]
+]];
+const PHRASES=[];RAW.forEach((arr,u)=>arr.forEach(r=>PHRASES.push({id:PHRASES.length,u,en:r[0],th:r[1],rom:r[2],note:r[3]||"",p:!!r[4]})));
+const DIALOGUES=[
+{t:"At the guesthouse",s:"You've just arrived. The owner comes out to greet you.",steps:[
+{n:["สวัสดีค่ะ ยินดีต้อนรับค่ะ","sà-wàt-dii khâ, yin-dii dtâawn-ráp khâ","Hello! Welcome!"],q:"Greet her back",o:[["sà-wàt-dii khâ","Hello",1],["laa-gàawn khâ","Goodbye",0],["khàawp-khun khâ","Thank you",0]]},
+{n:["คุณชื่ออะไรคะ","khun chûue à-rai khá","What's your name?"],q:"Tell her your name",o:[["chǎn chûue … khâ","My name is…",1],["mâi khâo-jai khâ","I don't understand",0],["sà-baai-dii khâ","I'm fine",0]]},
+{n:["มาจากไหนคะ","maa jàak nǎi khá","Where are you from?"],q:"Say you're from America",o:[["chǎn maa jàak à-mee-rí-gaa khâ","I'm from America",1],["phûut cháa-cháa nàwy khâ","Please speak slowly",0],["châi khâ","Yes",0]]},
+{n:["โห พูดไทยเก่งนะคะ!","hǒo, phûut thai gèng ná khá!","Wow, your Thai is good!"],q:"Be modest — you speak a little Thai",o:[["phûut thai dâai nít-nàwy khâ","I speak a little Thai",1],["phaaeng bpai khâ","Too expensive!",0],["ìm láaeo khâ","I'm full",0]]},
+{n:["ยินดีที่ได้รู้จักค่ะ","yin-dii thîi dâai rúu-jàk khâ","Nice to meet you"],q:"Say it back to her",o:[["yin-dii thîi dâai rúu-jàk khâ","Nice to meet you",1],["mâi bpen rai khâ","It's okay",0],["fǎn-dii khâ","Sweet dreams",0]]}]},
+{t:"The market stall",s:"A silk scarf caught your eye at Chatuchak market.",steps:[
+{n:["เชิญดูก่อนได้ค่ะ","chooen duu gàawn dâai khâ","Have a look around!"],q:"Ask how much this one is",o:[["an-níi thâo-rài khá","How much is this?",1],["gìi an khá","How many?",0],["dtûu ee-thii-em yùu nǎi khá","Where's an ATM?",0]]},
+{n:["สามร้อยบาทค่ะ","sǎam ráawy bàat khâ",""],c:1,q:"How much did she say?",o:[["300 baht",1],["30 baht",0],["3,000 baht",0]]},
+{q:"Tell her that's too expensive — with a smile",o:[["phaaeng bpai khâ","Too expensive!",1],["thùuk mâak khâ","Very cheap!",0],["frii mǎi khá","Is it free?",0]]},
+{q:"Ask if she can lower the price",o:[["lót dâai mǎi khá","Can you lower the price?",1],["ráp bàt mǎi khá","Do you take cards?",0],["jàai ngoen-sòt khâ","I'll pay cash",0]]},
+{n:["ได้ค่ะ สองร้อยห้าสิบ","dâai khâ, sǎawng ráawy hâa-sìp","OK then…"],c:1,q:"What's her new price?",o:[["250 baht",1],["205 baht",0],["550 baht",0]]},
+{q:"Deal! Thank her warmly",o:[["khàawp-khun mâak khâ","Thank you so much",1],["mâi châi khâ","No",0],["phûut ìik khráng dâai mǎi khá","Can you say that again?",0]]}]},
+{t:"Dinner for two",s:"A little riverside restaurant. The server comes over.",steps:[
+{n:["สวัสดีค่ะ รับอะไรดีคะ","sà-wàt-dii khâ, ráp à-rai dii khá","Hello! What would you like?"],q:"Ask for the menu",o:[["khǎaw mee-nuu nàwy khâ","Can I see the menu?",1],["chék-bin khâ","Check, please",0],["khǎaw náam-khǎeng khâ","Can I have ice?",0]]},
+{q:"Order the pad thai",o:[["khǎaw phàt-thai khâ","Pad thai, please",1],["khǎaw gaa-faae yen khâ","Iced coffee, please",0],["khǎaw khâao-nǐao má-mûang khâ","Mango sticky rice, please",0]]},
+{n:["เผ็ดไหมคะ","phèt mǎi khá","Spicy?"],q:"Just a little spicy",o:[["phèt nít-nàwy khâ","Just a little spicy",1],["phèt mâak khâ","Very spicy",0],["mâi sài náam-dtaan khâ","No sugar",0]]},
+{q:"Ask for water too",o:[["khǎaw náam khâ","Water, please",1],["khǎaw bia khâ","Beer, please",0],["khǎaw náam má-phráao khâ","Coconut water, please",0]]},
+{n:["อร่อยไหมคะ","à-ràwy mǎi khá","Is it good?"],q:"It's REALLY good",o:[["à-ràwy mâak khâ","Really delicious!",1],["ìm láaeo khâ","I'm full",0],["hǐu khâao khâ","I'm hungry",0]]},
+{q:"Time to go — ask for the check",o:[["chék-bin khâ","Check, please",1],["khǎaw ìik nùeng khâ","One more, please",0],["gin phèt mâi dâai khâ","I can't eat spicy food",0]]}]},
+{t:"Taxi to the hotel",s:"You flag down a pink Bangkok taxi.",steps:[
+{n:["ไปไหนคะ","bpai nǎi khá","Where to?"],q:"To the hotel, please",o:[["bpai roong-raaem khâ","To the hotel, please",1],["bpai sà-nǎam-bin khâ","To the airport, please",0],["jàawt dtrong-níi khâ","Stop here",0]]},
+{q:"Ask her to turn on the meter",o:[["bpòoet mí-dtooe dûai khâ","Please turn on the meter",1],["cháa-cháa nàwy khâ","Slowly, please",0],["dtrong bpai khâ","Go straight",0]]},
+{q:"Ask if it takes long",o:[["chái wee-laa naan mǎi khá","Does it take long?",1],["àawk gìi moong khá","What time does it leave?",0],["súue dtǔa thîi-nǎi khá","Where do I buy tickets?",0]]},
+{n:["ไม่นานค่ะ ใกล้ๆ","mâi naan khâ, glâi-glâi","…"],c:1,q:"What did she say?",o:[["Not long — it's near",1],["Very far away",0],["The road is closed",0]]},
+{q:"You spot the hotel — turn left here",o:[["líao sáai khâ","Turn left",1],["líao khwǎa khâ","Turn right",0],["raaw sàk-khrûu khâ","Just a moment",0]]},
+{q:"Stop right here",o:[["jàawt dtrong-níi khâ","Stop here",1],["dtrong bpai khâ","Go straight",0],["bpai sà-thǎa-nii rót-fai khâ","To the train station",0]]}]},
+{t:"The perfect shirt",s:"A night market stall, and one shirt is calling to you.",steps:[
+{n:["หาอะไรอยู่คะ","hǎa à-rai yùu khá","Looking for something?"],q:"Just looking, thanks",o:[["duu chǒoei-chǒoei khâ","I'm just looking",1],["ao an-níi khâ","I'll take this one",0],["nîi à-rai khá","What is this?",0]]},
+{q:"That shirt though! Ask if she has another color",o:[["mii sǐi ùuen mǎi khá","Do you have another color?",1],["mii yài gwàa níi mǎi khá","Do you have a bigger one?",0],["mii thǔng mǎi khá","Do you have a bag?",0]]},
+{q:"Ask if you can try it on",o:[["laawng dâai mǎi khá","Can I try it on?",1],["hàaw hâi nàwy dâai mǎi khá","Can you wrap it?",0],["lót dâai mǎi khá","Can you lower the price?",0]]},
+{n:["สวยมากค่ะ!","sǔai mâak khâ!","So beautiful on you!"],q:"You love it — ask for her best price",o:[["raa-khaa sùt-tháai thâo-rài khá","What's your best price?",1],["mâi châawp khâ","I don't like it",0],["dtà-làat yùu thîi-nǎi khá","Where's the market?",0]]},
+{q:"Take it!",o:[["ao an-níi khâ","I'll take this one",1],["duu chǒoei-chǒoei khâ","I'm just looking",0],["mâi ao thǔng khâ","No bag, thanks",0]]}]},
+{t:"Finding Wat Pho",s:"Somewhere in the old city, temple-bound and slightly lost.",steps:[
+{q:"Stop a passerby politely",o:[["khǎaw-thôot khâ","Excuse me",1],["thîi-nân","There",0],["bpai gan thòe!","Let's go!",0]]},
+{q:"Ask where the temple is",o:[["wát yùu thîi-nǎi khá","Where's the temple?",1],["hâwng-náam yùu thîi-nǎi khá","Where's the bathroom?",0],["ráan aa-hǎan yùu thîi-nǎi khá","Where's a restaurant?",0]]},
+{n:["ตรงไป แล้วเลี้ยวขวาที่สี่แยกค่ะ","dtrong bpai, láaeo líao khwǎa thîi sìi-yâaek khâ","…"],c:1,q:"Which way?",o:[["Straight, then right at the intersection",1],["Left at the temple",0],["Take a boat across the river",0]]},
+{q:"Ask if it's far",o:[["glai mǎi khá","Is it far?",1],["bpìt gìi moong khá","What time does it close?",0],["thâo-rài khá","How much?",0]]},
+{n:["ไม่ไกลค่ะ เดินไปได้","mâi glai khâ, dooen bpai dâai","…"],c:1,q:"Good news?",o:[["Not far — you can walk",1],["Too far to walk",0],["It closed yesterday",0]]},
+{q:"One more thing — what time does it close?",o:[["bpìt gìi moong khá","What time does it close?",1],["bpòoet gìi moong khá","What time does it open?",0],["gìi moong láaeo khá","What time is it?",0]]}]},
+{t:"At the pharmacy",s:"Last night's street food was an adventure. Time for the ร้านขายยา.",steps:[
+{n:["สวัสดีค่ะ","sà-wàt-dii khâ","Hello"],q:"Tell her you don't feel well",o:[["mâi sà-baai khâ","I don't feel well",1],["chǎn oo-khee khâ","I'm okay",0],["sà-baai-dii khâ","I'm fine",0]]},
+{n:["เป็นอะไรคะ","bpen à-rai khá","What's wrong?"],q:"You have a headache",o:[["bpùat hǔa khâ","Headache",1],["bpùat tháawng khâ","Stomachache",0],["jèp dtrong-níi khâ","It hurts here",0]]},
+{q:"Ask for medicine",o:[["khǎaw yaa khâ","Medicine, please",1],["khǎaw náam khâ","Water, please",0],["rîak dtam-rùat!","Call the police!",0]]},
+{n:["ห้าสิบบาทค่ะ","hâa-sìp bàat khâ","…"],c:1,q:"How much is it?",o:[["50 baht",1],["15 baht",0],["500 baht",0]]},
+{q:"Also ask if they have mosquito repellent",o:[["mii yaa gan yung mǎi khá","Do you have mosquito repellent?",1],["mii khriim gan dàaet mǎi khá","Do you have sunscreen?",0],["mii phláat-sà-dtooe mǎi khá","Do you have band-aids?",0]]},
+{q:"Thank her and say goodbye",o:[["khàawp-khun khâ sà-wàt-dii khâ","Thank you, goodbye",1],["chùk-chǒoen khâ!","It's an emergency!",0],["fǎn-dii khâ","Sweet dreams",0]]}]},
+{t:"Sunset on the beach",s:"Koh Lanta. A local woman selling grilled squid strikes up a chat.",steps:[
+{n:["มาเที่ยวเหรอคะ","maa thîao rǒoe khá","Here on vacation?"],q:"Yes — here on vacation",o:[["châi khâ, maa thîao khâ","Yes, on vacation",1],["mâi châi khâ","No",0],["lǒng thaang khâ","I'm lost",0]]},
+{n:["พูดไทยได้ด้วย!","phûut thai dâai dûai!","And you speak Thai!"],q:"Tell her you're learning Thai",o:[["chǎn gam-lang rian phaa-sǎa-thai khâ","I'm learning Thai",1],["phûut phaa-sǎa ang-grìt dâai mǎi khá","Do you speak English?",0],["bplaae wâa à-rai khá","What does that mean?",0]]},
+{q:"Share your story — you spoke Thai as a kid",o:[["dtaawn dèk chǎn phûut thai dâai khâ","I spoke Thai as a kid",1],["chǎn aa-yú yîi-sìp bpii","I'm twenty years old",0],["faaen khǎawng chǎn","My partner",0]]},
+{n:["สุดยอดเลย!","sùt-yâawt looei!","That's amazing!"],q:"Tell her Thailand is beautiful",o:[["mueang-thai sǔai mâak khâ","Thailand is so beautiful",1],["wan-níi ráawn mâak!","It's so hot today!",0],["fǒn dtòk","It's raining",0]]},
+{q:"Ask her to take a photo of you two",o:[["thàai-rûup hâi nàwy dâai mǎi khá","Can you take a photo for me?",1],["thàai-rûup dâai mǎi khá","Can I take a photo?",0],["wâai-náam","Swim",0]]},
+{q:"Say goodbye — see you later!",o:[["láaeo jooe gan khâ","See you later!",1],["jing rǒoe","Really?",0],["láaw-lên","Just kidding",0]]}]}
+];
+/* ---------- state ---------- */
+const KEY="sawatdee-v1";
+const INTERVALS=[0,1,2,4,7,14,30,60];
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function daysBetween(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5);}
+let S=null;
+function defaultState(){return {name:"",trip:"2027-04-25",start:todayStr(),streak:0,best:0,last:"",sessions:0,newPer:4,placed:false,welcomed:false,dlg:[],ph:{}};}
+function load(){try{const r=localStorage.getItem(KEY);S=r?Object.assign(defaultState(),JSON.parse(r)):defaultState();}catch(e){S=defaultState();}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function P(id){if(!S.ph[id])S.ph[id]={lv:0,due:todayStr(),intro:false};return S.ph[id];}
+function introCount(u){let c=0;PHRASES.forEach(p=>{if((u===undefined||p.u===u)&&S.ph[p.id]&&S.ph[p.id].intro)c++;});return c;}
+function unitTotal(u){return RAW[u].length;}
+function dueIds(){const t=todayStr();return PHRASES.filter(p=>S.ph[p.id]&&S.ph[p.id].intro&&S.ph[p.id].due<=t).map(p=>p.id);}
+function activeUnit(){for(let u=0;u<UNITS.length;u++){if(introCount(u)<unitTotal(u))return u;}return UNITS.length-1;}
+function dlgUnlocked(u){return introCount(u)>=Math.ceil(unitTotal(u)*0.8);}
+
+/* ---------- tts ---------- */
+let thaiVoice=null,voicesTried=false;
+function findVoice(){const vs=speechSynthesis.getVoices();thaiVoice=vs.find(v=>v.lang&&v.lang.toLowerCase().startsWith("th"))||null;voicesTried=vs.length>0;}
+if("speechSynthesis"in window){findVoice();speechSynthesis.onvoiceschanged=()=>{findVoice();};}
+function speak(th,slow){if(!("speechSynthesis"in window))return;const txt=th.replace(/\.{3}|…/g,"").trim();if(!txt)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="th-TH";if(thaiVoice)u.voice=thaiVoice;u.rate=slow?0.55:0.9;speechSynthesis.speak(u);}
+
+/* ---------- helpers ---------- */
+const app=document.getElementById("app");
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function distractors(id,n){const me=PHRASES[id];const same=shuffle(PHRASES.filter(p=>p.id!==id&&p.u===me.u));const rest=shuffle(PHRASES.filter(p=>p.id!==id&&p.u!==me.u));return same.concat(rest).slice(0,n);}
+const ICO={play:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+home:'<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>',
+book:'<svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h14"/></svg>',
+gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8"/></svg>'};
+const TONE='<span class="tonelegend">tones: a mid &nbsp;·&nbsp; à low &nbsp;·&nbsp; â falling &nbsp;·&nbsp; á high &nbsp;·&nbsp; ǎ rising</span>';
+function audioBtns(th,big){return '<div class="audiobtns"><button class="audiobtn'+(big?' big':'')+'" data-say="'+esc(th)+'">'+ICO.play+'Listen</button><button class="audiobtn'+(big?' big':'')+'" data-say="'+esc(th)+'" data-slow="1">'+ICO.play+'Slow</button></div>';}
+function wireAudio(root){root.querySelectorAll("[data-say]").forEach(b=>b.addEventListener("click",()=>speak(b.dataset.say,b.dataset.slow==="1")));}
+function navBar(cur){return '<nav class="nav"><div class="inner">'+[["home","Home",ICO.home],["book","Phrasebook",ICO.book],["gear","Settings",ICO.gear]].map(x=>'<button data-nav="'+x[0]+'" class="'+(cur===x[0]?"on":"")+'">'+x[2]+x[1]+'</button>').join("")+'</div></nav>';}
+function wireNav(){app.querySelectorAll("[data-nav]").forEach(b=>b.addEventListener("click",()=>{const v=b.dataset.nav;if(v==="home")renderHome();else if(v==="book")renderBook();else renderSettings();}));}
+function ttsBanner(){return(voicesTried&&!thaiVoice)?'<div class="ttsbanner">No Thai voice found on this device. On Android: Settings → General management → Text-to-speech → install Thai in Google Speech services. Audio buttons will stay quiet until then.</div>':"";}
+
+/* ---------- home ---------- */
+function renderHome(){
+const total=PHRASES.length,learned=introCount();
+const today=todayStr(),days=daysBetween(today,S.trip);
+const due=dueIds().length;
+const au=activeUnit();
+const tripDays=Math.max(1,daysBetween(S.start,S.trip));
+const elapsed=Math.min(tripDays,Math.max(0,daysBetween(S.start,today)));
+const expected=Math.round(total*elapsed/tripDays);
+const onPace=learned>=expected*0.75||elapsed<7;
+const newLeft=unitTotal(au)-introCount(au);
+const hello=S.name?("Sawatdee, "+esc(S.name)):"Sawatdee";
+app.innerHTML='<div class="view">'
++'<div class="topbar"><div class="brand"><span class="th">สวัสดี</span>Sawatdee</div><div class="streakchip'+(S.streak>0?" hot":"")+'">'+S.streak+'-day streak</div></div>'
++ttsBanner()
++'<div class="hero"><span class="mark">ส</span><div class="kicker">'+hello+'</div>'
++'<h1>'+(days>0?days+" days to Thailand":"You're there! เที่ยวให้สนุก!")+'</h1>'
++'<div class="sub">'+(due>0?due+" phrases due for review":"Nothing due — nice and current")+(newLeft>0?" · new: "+UNITS[au].n:"")+'</div>'
++'<button class="bigbtn" id="startbtn">Start today’s session</button>'
++'<div class="counts"><span>'+learned+' / '+total+' phrases learned</span><span>'+S.sessions+' sessions</span></div></div>'
++'<div class="card"><div class="progressbar"><i style="width:'+Math.round(100*learned/total)+'%"></i></div>'
++'<div class="pacenote">'+(onPace?'<b>On pace</b> for the trip':'<b class="behind">A little behind</b> — pace target is '+expected)+' · '+learned+' learned, target '+expected+' by today</div></div>'
++'<div class="sectionlabel">Units</div>'
++UNITS.map((u,i)=>{const ic=introCount(i),tot=unitTotal(i);const unlocked=dlgUnlocked(i);const done=S.dlg.includes(i);
+return '<button class="unitrow'+(i===au?" active":"")+'" data-unit="'+i+'"><span class="thglyph">'+u.g+'</span><span class="uinfo"><span class="uname">'+esc(u.n)+' <span style="font-family:var(--font-th);color:var(--ink2);font-weight:400">'+u.th+'</span></span><br><span class="usub">'+esc(u.d)+'</span>'+(unlocked?'<br><span class="dlgchip'+(done?" done":"")+'">'+(done?"✓ ":"")+'Dialogue: '+esc(DIALOGUES[i].t)+'</span>':"")+'</span><span class="uprog'+(ic>=tot?" done":"")+'">'+ic+'/'+tot+'</span></button>';}).join("")
++'</div>'+navBar("home");
+wireNav();
+document.getElementById("startbtn").addEventListener("click",()=>startSession());
+app.querySelectorAll("[data-unit]").forEach(b=>b.addEventListener("click",()=>{const u=+b.dataset.unit;
+if(dlgUnlocked(u)&&!S.dlg.includes(u))startDialogue(u);
+else if(introCount(u)<unitTotal(u))startSession(u);
+else startDialogue(u);}));
+}
+
+/* ---------- session ---------- */
+let SES=null;
+function startSession(forceUnit){
+const t=todayStr();
+const reviews=shuffle(dueIds()).slice(0,20);
+const u=forceUnit!==undefined?forceUnit:activeUnit();
+const fresh=PHRASES.filter(p=>p.u===u&&!(S.ph[p.id]&&S.ph[p.id].intro)).slice(0,S.newPer).map(p=>p.id);
+if(reviews.length===0&&fresh.length===0){startDialogue(u,true);return;}
+const items=[];let ri=0;
+fresh.forEach(id=>{items.push({id,teach:1});items.push({id,q:1,fresh:1});for(let k=0;k<3&&ri<reviews.length;k++)items.push({id:reviews[ri++],q:1});});
+while(ri<reviews.length)items.push({id:reviews[ri++],q:1});
+SES={items,i:0,right:0,wrong:0,redos:[],nNew:fresh.length,nRev:reviews.length};
+renderStep();
+}
+function sessionLen(){return SES.items.length+SES.redos.length;}
+function renderStep(){
+if(SES.i>=SES.items.length){
+  if(SES.redos.length){SES.items=SES.items.concat(SES.redos);SES.redos=[];}
+  else{finishSession();return;}
+}
+const it=SES.items[SES.i];const p=PHRASES[it.id];
+const prog=Math.round(100*SES.i/sessionLen());
+const top='<div class="sesstop"><button class="x" id="quit" aria-label="Quit session">×</button><div class="progressbar"><i style="width:'+prog+'%"></i></div></div>';
+if(it.teach){
+  const st=P(it.id);st.intro=true;st.lv=0;st.due=todayStr();save();
+  app.innerHTML='<div class="fullview">'+top
+  +'<div class="teach"><span class="newtag">New phrase</span><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'
+  +audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+TONE+'</div>'
+  +'<button class="checkbtn" id="cont">Got it</button></div>';
+  wireCommon();speak(p.th,false);
+  document.getElementById("cont").addEventListener("click",()=>{SES.i++;renderStep();});
+  return;
+}
+renderQuiz(it,p,top);
+}
+function pickMode(lv,p){
+const toks=p.rom.replace(/…|\.{3}/g,"").trim().split(/\s+/).filter(Boolean);
+const pool=lv<=1?["en2rom","rom2en"]:lv<=3?["listen2en","en2rom","rom2en"]:["listen2rom","listen2en","en2rom"];
+let m=pool[Math.floor(Math.random()*pool.length)];
+if(lv>=3&&toks.length>=4&&Math.random()<0.45)m="unscramble";
+return m;
+}
+function renderQuiz(it,p,top){
+const lv=P(it.id).lv;const mode=it.fresh?"en2rom":pickMode(lv,p);
+if(mode==="unscramble"){renderUnscramble(it,p,top);return;}
+const ds=distractors(it.id,3);const opts=shuffle([p].concat(ds));
+let promptHtml="",optHtml="";
+if(mode==="en2rom"){promptHtml='<div class="exprompt">How do you say…</div><div class="exq">'+esc(p.en)+'</div>';
+  optHtml=opts.map(o=>'<button class="opt" data-ok="'+(o.id===p.id?1:0)+'"><span class="rom">'+esc(o.rom)+'</span><br><span class="sub">'+esc(o.th)+'</span></button>').join("");}
+else if(mode==="rom2en"){promptHtml='<div class="exprompt">What does this mean?</div><div class="exq">'+esc(p.rom)+'<br><span class="th" style="font-size:1.1rem;color:var(--ink2)">'+esc(p.th)+'</span></div>'+audioBtns(p.th);
+  optHtml=opts.map(o=>'<button class="opt" data-ok="'+(o.id===p.id?1:0)+'"><span class="rom" style="font-family:var(--font-ui)">'+esc(o.en)+'</span></button>').join("");}
+else if(mode==="listen2en"){promptHtml='<div class="exprompt">Listen — what does she mean?</div>'+audioBtns(p.th,true);
+  optHtml=opts.map(o=>'<button class="opt" data-ok="'+(o.id===p.id?1:0)+'"><span class="rom" style="font-family:var(--font-ui)">'+esc(o.en)+'</span></button>').join("");}
+else{promptHtml='<div class="exprompt">Listen — which one did you hear?</div>'+audioBtns(p.th,true);
+  optHtml=opts.map(o=>'<button class="opt" data-ok="'+(o.id===p.id?1:0)+'"><span class="rom">'+esc(o.rom)+'</span></button>').join("");}
+app.innerHTML='<div class="fullview">'+top+'<div class="exwrap">'+promptHtml+'<div class="opts">'+optHtml+'</div><div id="fb"></div></div><button class="checkbtn" id="cont" disabled>Continue</button></div>';
+wireCommon();
+if(mode==="listen2en"||mode==="listen2rom")setTimeout(()=>speak(p.th,false),250);
+let answered=false;
+app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+  if(answered)return;answered=true;
+  const ok=b.dataset.ok==="1";
+  app.querySelectorAll(".opt").forEach(o=>{o.disabled=true;if(o.dataset.ok==="1")o.classList.add("right");});
+  if(!ok)b.classList.add("wrong");
+  grade(it,ok);
+  document.getElementById("fb").innerHTML=ok
+    ?'<div class="feedback good">ถูกต้อง! Correct — <span class="fbrom">'+esc(p.rom)+'</span></div>'
+    :'<div class="feedback bad">Not quite. It’s <span class="fbrom">'+esc(p.rom)+'</span> — '+esc(p.en)+'</div>';
+  speak(p.th,false);
+  const c=document.getElementById("cont");c.disabled=false;c.focus();
+}));
+document.getElementById("cont").addEventListener("click",()=>{SES.i++;renderStep();});
+}
+function renderUnscramble(it,p,top){
+const toks=p.rom.replace(/…|\.{3}/g,"").trim().split(/\s+/).filter(Boolean);
+const bank=shuffle(toks.map((t,i)=>({t,i})));
+let built=[];
+app.innerHTML='<div class="fullview">'+top+'<div class="exwrap"><div class="exprompt">Build the phrase</div><div class="exq">'+esc(p.en)+'</div>'
++audioBtns(p.th)+'<div class="buildrow" id="build"></div><div class="bank" id="bank">'
++bank.map((b,k)=>'<button class="chiptok" data-k="'+k+'">'+esc(b.t)+'</button>').join("")
++'</div><div id="fb"></div></div><button class="checkbtn" id="cont" disabled>Check</button></div>';
+wireCommon();
+const build=document.getElementById("build"),cont=document.getElementById("cont");
+function redraw(){build.innerHTML=built.map((k,pos)=>'<button class="chiptok" data-pos="'+pos+'">'+esc(bank[k].t)+'</button>').join("");
+  build.querySelectorAll("[data-pos]").forEach(b=>b.addEventListener("click",()=>{const pos=+b.dataset.pos;const k=built.splice(pos,1)[0];document.querySelector('#bank [data-k="'+k+'"]').classList.remove("used");redraw();}));
+  cont.disabled=built.length!==toks.length;}
+document.querySelectorAll("#bank .chiptok").forEach(b=>b.addEventListener("click",()=>{if(b.classList.contains("used"))return;b.classList.add("used");built.push(+b.dataset.k);redraw();}));
+let checked=false;
+cont.addEventListener("click",()=>{
+  if(!checked){checked=true;
+    const ans=built.map(k=>bank[k].i).join(",");const ok=ans===toks.map((_,i)=>i).join(",");
+    grade(it,ok);
+    document.getElementById("fb").innerHTML=ok?'<div class="feedback good">ถูกต้อง! Correct!</div>':'<div class="feedback bad">It’s: <span class="fbrom">'+esc(toks.join(" "))+'</span></div>';
+    speak(p.th,false);cont.textContent="Continue";
+  }else{SES.i++;renderStep();}
+});
+}
+function grade(it,ok){
+const st=P(it.id);
+if(!it.redo){
+  if(ok){SES.right++;st.lv=Math.min(7,st.lv+1);st.due=addDays(todayStr(),INTERVALS[st.lv]);}
+  else{SES.wrong++;st.lv=Math.max(0,st.lv-2);st.due=addDays(todayStr(),1);SES.redos.push({id:it.id,q:1,redo:1});}
+}else if(!ok){SES.redos.push({id:it.id,q:1,redo:1});}
+save();
+}
+function finishSession(){
+const t=todayStr();
+if(S.last!==t){S.streak=(S.last===addDays(t,-1))?S.streak+1:1;S.best=Math.max(S.best,S.streak);S.last=t;}
+S.sessions++;save();
+const acc=SES.right+SES.wrong?Math.round(100*SES.right/(SES.right+SES.wrong)):100;
+app.innerHTML='<div class="fullview"><div class="finish"><div class="bigth">เก่งมาก!</div><h2>gèng mâak — well done!</h2>'
++'<p>'+SES.nRev+' reviewed · '+SES.nNew+' new · '+acc+'% right</p>'
++'<div class="statgrid" style="width:100%;max-width:20rem"><div class="stat"><div class="n">'+S.streak+'</div><div class="l">day streak</div></div><div class="stat"><div class="n">'+introCount()+'</div><div class="l">phrases</div></div></div>'
++'</div><button class="checkbtn" id="cont">Back home</button></div>';
+document.getElementById("cont").addEventListener("click",renderHome);
+}
+function wireCommon(){wireAudio(app);const q=document.getElementById("quit");if(q)q.addEventListener("click",renderHome);}
+
+/* ---------- dialogue ---------- */
+function startDialogue(u,fromSession){
+const d=DIALOGUES[u];if(!dlgUnlocked(u)){startSession(u);return;}
+let i=0,log=[],mistakes=0;
+function bubbleNpc(n,hideEn){return '<div class="speaker">Her</div><div class="bubble npc" data-say="'+esc(n[0])+'"><span class="bth">'+esc(n[0])+'</span><br><span class="brom">'+esc(n[1])+'</span>'+(n[2]&&!hideEn?'<div class="ben">'+esc(n[2])+'</div>':"")+'</div>';}
+function bubbleMe(o){return '<div class="bubble me"><span class="brom">'+esc(o[0])+'</span><div class="ben">'+esc(o[1])+'</div></div>';}
+function step(){
+  if(i>=d.steps.length){
+    if(!S.dlg.includes(u))S.dlg.push(u);save();
+    app.innerHTML='<div class="fullview"><div class="finish"><div class="bigth">จบ!</div><h2>Scene complete</h2><p>'+esc(d.t)+' · '+(mistakes===0?"flawless!":mistakes+" retr"+(mistakes>1?"ies":"y"))+'</p></div><button class="checkbtn" id="cont">Back home</button></div>';
+    document.getElementById("cont").addEventListener("click",renderHome);return;
+  }
+  const st=d.steps[i];
+  const isC=st.c===1;
+  let html='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div style="flex:1;font-family:var(--font-d);font-weight:700">'+esc(d.t)+'</div><div class="streakchip">'+(i+1)+'/'+d.steps.length+'</div></div>';
+  if(i===0&&log.length===0)html+='<p class="notice">'+esc(d.s)+' Tap any bubble to hear it again.</p>';
+  html+='<div class="bubbles">'+log.join("");
+  if(st.n)html+=bubbleNpc(st.n,isC&&!st.done);
+  html+='</div><div style="margin-top:auto"><div class="exprompt" style="margin-bottom:.5rem">'+esc(st.q)+'</div><div class="opts">';
+  const opts=st._sh||(st._sh=shuffle(st.o.map((o,k)=>k)));
+  opts.forEach(k=>{const o=st.o[k];const ok=isC?o[1]:o[2];
+    html+='<button class="opt" data-k="'+k+'" data-ok="'+ok+'">'+(isC?'<span class="rom" style="font-family:var(--font-ui)">'+esc(o[0])+'</span>':'<span class="rom">'+esc(o[0])+'</span><br><span class="sub" style="font-family:var(--font-ui)">'+esc(o[1])+'</span>')+'</button>';});
+  html+='</div><div id="fb"></div></div></div>';
+  app.innerHTML=html;wireAudio(app);
+  document.getElementById("quit").addEventListener("click",renderHome);
+  if(st.n&&!st.played){st.played=1;setTimeout(()=>speak(st.n[0],false),300);}
+  app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+    if(b.dataset.ok==="1"){
+      b.classList.add("right");
+      if(st.n)log.push(bubbleNpc(st.n,false));
+      if(!isC){const o=st.o[+b.dataset.k];log.push(bubbleMe(o));const ph=PHRASES.find(p=>p.rom===o[0]);if(ph)speak(ph.th,false);}
+      st.done=1;setTimeout(()=>{i++;step();},700);
+    }else{mistakes++;b.classList.add("wrong");b.disabled=true;
+      document.getElementById("fb").innerHTML='<div class="feedback bad">Hmm — try another.</div>';}
+  }));
+}
+step();
+}
+
+/* ---------- placement ---------- */
+function startPlacement(){
+const ids=PHRASES.filter(p=>p.p&&!(S.ph[p.id]&&S.ph[p.id].intro)).map(p=>p.id);
+let i=0,knew=0;
+function step(){
+  if(i>=ids.length){S.placed=true;save();
+    app.innerHTML='<div class="fullview"><div class="finish"><div class="bigth">ดีมาก!</div><h2>'+knew+' phrases still with you</h2><p>They’re seeded deep into your review schedule — the app will focus on what’s actually new.</p></div><button class="checkbtn" id="cont">Let’s begin</button></div>';
+    document.getElementById("cont").addEventListener("click",renderHome);return;}
+  const p=PHRASES[ids[i]];
+  app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div class="progressbar"><i style="width:'+Math.round(100*i/ids.length)+'%"></i></div></div>'
+  +'<div class="exprompt">Memory check '+(i+1)+' of '+ids.length+' — does this ring a bell?</div>'
+  +'<div class="teach"><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)
+  +'<div id="reveal" style="display:none"><span class="en" style="font-size:1.15rem;font-weight:700;color:var(--ink)">'+esc(p.en)+'</span>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'</div></div>'
+  +'<div id="btns" style="margin-top:auto"><button class="checkbtn" id="show">Show meaning</button></div></div>';
+  wireAudio(app);speak(p.th,false);
+  document.getElementById("quit").addEventListener("click",()=>{S.placed=true;save();renderHome();});
+  document.getElementById("show").addEventListener("click",()=>{
+    document.getElementById("reveal").style.display="block";
+    document.getElementById("btns").innerHTML='<div class="btnrow"><button class="checkbtn secondary" id="no" style="margin-top:0">Not yet</button><button class="checkbtn" id="yes" style="margin-top:0">I knew it</button></div>';
+    document.getElementById("yes").addEventListener("click",()=>{const st=P(p.id);st.intro=true;st.lv=3;st.due=addDays(todayStr(),4);knew++;save();i++;step();});
+    document.getElementById("no").addEventListener("click",()=>{i++;step();});
+  });
+}
+step();
+}
+
+/* ---------- phrasebook ---------- */
+function renderBook(filter){
+filter=(filter||"").toLowerCase();
+let rows="";
+UNITS.forEach((u,ui)=>{
+  const ps=PHRASES.filter(p=>p.u===ui&&(!filter||p.en.toLowerCase().includes(filter)||p.rom.toLowerCase().includes(filter)));
+  if(!ps.length)return;
+  rows+='<div class="pbunit">'+u.g+' '+esc(u.n)+'</div>'+ps.map(p=>{const st=S.ph[p.id];const cls=st&&st.intro?(st.lv>=4?"l2":"l1"):"";
+  return '<button class="pbrow" data-id="'+p.id+'"><span><span class="pben">'+esc(p.en)+'</span><br><span class="pbrom">'+esc(p.rom)+'</span></span><span class="lvl '+cls+'"></span></button>';}).join("");
+});
+app.innerHTML='<div class="view"><div class="topbar"><div class="brand"><span class="th">สวัสดี</span>Phrasebook</div></div>'
++'<div class="searchrow"><input id="q" type="search" placeholder="Search English or Thai sounds…" value="'+esc(filter)+'"></div>'
++(rows||'<p class="notice">No matches.</p>')+'</div>'+navBar("book");
+wireNav();
+const q=document.getElementById("q");
+q.addEventListener("input",()=>{const v=q.value;clearTimeout(q._t);q._t=setTimeout(()=>{renderBook(v);const nq=document.getElementById("q");nq.focus();nq.setSelectionRange(nq.value.length,nq.value.length);},250);});
+app.querySelectorAll("[data-id]").forEach(b=>b.addEventListener("click",()=>showPhrase(+b.dataset.id,()=>renderBook(filter))));
+}
+function showPhrase(id,back){
+const p=PHRASES[id];
+const ov=document.createElement("div");ov.className="overlay";
+ov.innerHTML='<div class="sheet"><div class="handle"></div><div class="teach" style="border:none;padding:0;background:none"><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+TONE+'</div></div>';
+document.body.appendChild(ov);wireAudio(ov);speak(p.th,false);
+ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
+}
+
+/* ---------- settings ---------- */
+function renderSettings(){
+app.innerHTML='<div class="view"><div class="topbar"><div class="brand"><span class="th">สวัสดี</span>Settings</div></div>'
++ttsBanner()
++'<div class="card setrow"><label for="nm">Your name</label><input id="nm" value="'+esc(S.name)+'">'
++'<label for="td" style="margin-top:.6rem">Trip date</label><input id="td" type="date" value="'+esc(S.trip)+'">'
++'<label for="np" style="margin-top:.6rem">New phrases per session</label><select id="np">'+[2,3,4,5,6].map(n=>'<option value="'+n+'"'+(S.newPer===n?" selected":"")+'>'+n+'</option>').join("")+'</select>'
++'<div class="btnrow" style="margin-top:.8rem"><button class="smallbtn" id="saveset">Save</button><button class="smallbtn" id="testv">Test Thai voice</button></div></div>'
++'<div class="card setrow"><label>Reading the sounds</label><p class="notice" style="margin:.2rem 0">Tone marks: <b>a</b> mid · <b>à</b> low · <b>â</b> falling · <b>á</b> high · <b>ǎ</b> rising. Doubled vowels (aa, ii, uu) are held longer. <b>bp</b> and <b>dt</b> are sharp, unpuffed versions of b/t — <b>g</b> as in "go". Every phrase ends in <b>khâ</b> (statements) or <b>khá</b> (questions) — the polite particle for women.</p></div>'
++(S.placed?'':'<div class="card setrow"><label>Memory check-in</label><p class="notice" style="margin:.2rem 0">See which phrases stuck from childhood — they’ll skip ahead in the schedule.</p><button class="smallbtn" id="place">Start check-in</button></div>')
++'<div class="card setrow"><label>Backup</label><p class="notice" style="margin:.2rem 0">Copy this text somewhere safe (notes app, message to yourself). Paste it back to restore.</p>'
++'<textarea id="bk" spellcheck="false"></textarea><div class="btnrow"><button class="smallbtn" id="copy">Copy backup</button><button class="smallbtn" id="restore">Restore from pasted text</button></div></div>'
++'<div class="card setrow"><label>Danger zone</label><div class="btnrow"><button class="smallbtn warn" id="reset">Erase all progress</button></div></div>'
++'<p class="notice" style="text-align:center">Made with love for the Thailand trip · best streak: '+S.best+'</p>'
++'</div>'+navBar("gear");
+wireNav();
+const bk=document.getElementById("bk");bk.value=JSON.stringify(S);
+document.getElementById("saveset").addEventListener("click",()=>{S.name=document.getElementById("nm").value.trim();const td=document.getElementById("td").value;if(td)S.trip=td;S.newPer=+document.getElementById("np").value;save();renderHome();});
+document.getElementById("testv").addEventListener("click",()=>speak("สวัสดีค่ะ ยินดีต้อนรับ",false));
+const pl=document.getElementById("place");if(pl)pl.addEventListener("click",startPlacement);
+document.getElementById("copy").addEventListener("click",function(){bk.select();try{navigator.clipboard.writeText(bk.value).then(()=>{this.textContent="Copied!";});}catch(e){document.execCommand("copy");this.textContent="Copied!";}}.bind(document.getElementById("copy")));
+document.getElementById("restore").addEventListener("click",()=>{try{const v=JSON.parse(bk.value);if(v&&v.ph){S=Object.assign(defaultState(),v);save();renderHome();}else alert("That doesn’t look like a Sawatdee backup.");}catch(e){alert("Couldn’t read that backup text.");}});
+document.getElementById("reset").addEventListener("click",()=>{if(confirm("Erase ALL progress? This can’t be undone.")){S=defaultState();S.welcomed=true;save();renderHome();}});
+}
+
+/* ---------- welcome ---------- */
+function renderWelcome(){
+app.innerHTML='<div class="fullview" style="justify-content:center;gap:1.2rem">'
++'<div style="text-align:center"><div style="font-family:var(--font-th);font-size:4rem;color:var(--accent);line-height:1.1">สวัสดี</div><h1 style="font-size:2rem">Sawatdee</h1><p style="color:var(--ink2);margin:.4rem 0 0">Your Thai, phrase by phrase,<br>ready for the trip.</p></div>'
++'<div class="card setrow"><label for="nm">What should I call you?</label><input id="nm" placeholder="Your name">'
++'<label for="td" style="margin-top:.6rem">When do you land in Thailand?</label><input id="td" type="date" value="'+esc(S.trip)+'"></div>'
++'<button class="checkbtn" id="go" style="margin-top:0">เริ่มกันเลย — let’s start</button>'
++'<p class="notice" style="text-align:center">First: a 2-minute memory check-in.<br>Phrases you already know skip to the back of the line.</p></div>';
+document.getElementById("go").addEventListener("click",()=>{
+  S.name=document.getElementById("nm").value.trim();const td=document.getElementById("td").value;if(td)S.trip=td;
+  S.welcomed=true;save();startPlacement();
+});
+}
+
+/* ---------- boot ---------- */
+load();
+if(!S.welcomed)renderWelcome();else renderHome();
+</script>
