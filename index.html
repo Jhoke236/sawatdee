@@ -125,6 +125,15 @@ h1,h2,h3{font-family:var(--font-d); line-height:1.15; margin:0; text-wrap:balanc
 .teach .note{font-size:.85rem; color:var(--ink2); background:var(--surface2); border-radius:10px; padding:.55rem .75rem; margin-top:.3rem}
 .tonelegend{font-size:.72rem; color:var(--ink2); margin-top:.4rem; font-family:var(--font-w)}
 
+/* listen mode */
+.unitrow .thglyph svg{width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle}
+.lsnrow{display:flex; gap:1.1rem; align-items:center; justify-content:center; margin:.6rem 0}
+.ppbtn{width:4.4rem; height:4.4rem; border-radius:999px; background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow)}
+.ppbtn svg{width:30px; height:30px; fill:currentColor}
+.skipbtn{width:3.1rem; height:3.1rem; border-radius:999px; background:var(--surface2); color:var(--ink2); display:flex; align-items:center; justify-content:center}
+.skipbtn svg{width:20px; height:20px; fill:currentColor}
+.lsncount{text-align:center; font-size:.82rem; font-weight:700; color:var(--ink2); font-variant-numeric:tabular-nums}
+
 /* audio-pick exercise */
 .audioopt{display:flex; align-items:center; gap:.65rem; font-weight:700; color:var(--ink2)}
 .audioopt svg{width:18px; height:18px; fill:currentColor; flex-shrink:0}
@@ -536,7 +545,10 @@ function distractors(id,n){const me=PHRASES[id];const same=shuffle(PHRASES.filte
 const ICO={play:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
 home:'<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>',
 book:'<svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h14"/></svg>',
-gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8"/></svg>'};
+gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8"/></svg>',
+pauseI:'<svg viewBox="0 0 24 24"><path d="M7 4h4v16H7zM13 4h4v16h-4z"/></svg>',
+skipI:'<svg viewBox="0 0 24 24"><path d="M5 4l10 8-10 8zM17 4h3v16h-3z"/></svg>',
+phones:'<svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>'};
 const TONE='<span class="tonelegend">tones: a mid &nbsp;·&nbsp; à low &nbsp;·&nbsp; â falling &nbsp;·&nbsp; á high &nbsp;·&nbsp; ǎ rising</span>';
 function isStar(id){return !!(S.ph[id]&&S.ph[id].star);}
 function starChip(id){const on=isStar(id);return '<button class="starchip'+(on?" on":"")+'" data-star="'+id+'">'+(on?"★ In frequent review":"☆ Review often")+'</button>';}
@@ -567,6 +579,7 @@ app.innerHTML='<div class="view">'
 +'<div class="sub">'+(due>0?due+" phrases due for review":"Nothing due — nice and current")+(newLeft>0?" · new: "+UNITS[au].n:"")+'</div>'
 +'<button class="bigbtn" id="startbtn">Start today’s session</button>'
 +'<div class="counts"><span>'+learned+' / '+total+' phrases learned</span><span>'+S.sessions+' sessions</span></div></div>'
++'<button class="unitrow" id="lsnbtn"><span class="thglyph">'+ICO.phones+'</span><span class="uinfo"><span class="uname">Listen mode</span><br><span class="usub">Hands-free audio of your learned phrases — English, then the Thai twice</span></span><span class="uprog">'+learned+'</span></button>'
 +'<div class="card"><div class="progressbar"><i style="width:'+Math.round(100*learned/total)+'%"></i></div>'
 +'<div class="pacenote">'+(onPace?'<b>On pace</b> for the trip':'<b class="behind">A little behind</b> — pace target is '+expected)+' · '+learned+' learned, target '+expected+' by today</div></div>'
 +'<div class="sectionlabel">Units</div>'
@@ -575,6 +588,7 @@ return '<button class="unitrow'+(i===au?" active":"")+'" data-unit="'+i+'"><span
 +'</div>'+navBar("home");
 wireNav();
 document.getElementById("startbtn").addEventListener("click",()=>startSession());
+document.getElementById("lsnbtn").addEventListener("click",renderListen);
 app.querySelectorAll("[data-unit]").forEach(b=>b.addEventListener("click",()=>{const u=+b.dataset.unit;
 if(dlgUnlocked(u)&&!S.dlg.includes(u))startDialogue(u);
 else if(introCount(u)<unitTotal(u))startSession(u);
@@ -773,6 +787,73 @@ function step(){
   }));
 }
 step();
+}
+
+/* ---------- listen mode ---------- */
+let LSN=null;
+function speakOnce(text,lang,rate){return new Promise(res=>{const u=new SpeechSynthesisUtterance(text);u.lang=lang;if(lang==="th-TH"&&thaiVoice)u.voice=thaiVoice;u.rate=rate;u.onend=res;u.onerror=res;speechSynthesis.speak(u);});}
+function lsnWait(ms){return new Promise(r=>setTimeout(r,ms));}
+function lsnAlive(my){return LSN&&LSN.gen===my&&LSN.playing;}
+async function lsnAcquireWake(){try{if(LSN&&navigator.wakeLock)LSN.wake=await navigator.wakeLock.request("screen");}catch(e){}}
+function lsnReleaseWake(){try{if(LSN&&LSN.wake){LSN.wake.release();LSN.wake=null;}}catch(e){}}
+if(typeof document!=="undefined")document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&LSN&&LSN.playing)lsnAcquireWake();});
+function lsnBuild(){LSN.ids=shuffle(PHRASES.filter(p=>S.ph[p.id]&&S.ph[p.id].intro&&(!LSN.starOnly||isStar(p.id))).map(p=>p.id));LSN.i=0;}
+async function lsnLoop(){
+const my=LSN.gen;
+await lsnAcquireWake();
+while(lsnAlive(my)){
+  if(!LSN.ids.length)break;
+  if(LSN.i>=LSN.ids.length){LSN.ids=shuffle(LSN.ids);LSN.i=0;}
+  const p=PHRASES[LSN.ids[LSN.i]];
+  const np=document.getElementById("np"),lc=document.getElementById("lc");
+  if(!np)break;
+  np.innerHTML='<span class="newtag">Now playing</span><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>';
+  if(lc)lc.textContent=(LSN.i+1)+" / "+LSN.ids.length;
+  speechSynthesis.cancel();
+  await speakOnce(p.en.replace(/\s*\(.*?\)/g,"").replace(/…|\.{3}/g,""),"en-US",1);
+  if(!lsnAlive(my))break; await lsnWait(500);
+  const th=p.th.replace(/…|\.{3}/g,"").trim();
+  await speakOnce(th,"th-TH",0.85);
+  if(!lsnAlive(my))break; await lsnWait(600);
+  await speakOnce(th,"th-TH",0.85);
+  if(!lsnAlive(my))break; await lsnWait(1100);
+  LSN.i++;
+}
+}
+function lsnStop(){if(!LSN)return;LSN.playing=false;LSN.gen++;speechSynthesis.cancel();lsnReleaseWake();}
+function renderListen(){
+LSN={ids:[],i:0,playing:false,gen:0,starOnly:false,wake:null};
+lsnBuild();
+const empty=!LSN.ids.length;
+app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit" aria-label="Exit listen mode">×</button><div style="flex:1;font-family:var(--font-d);font-weight:700">Listen mode</div></div>'
++ttsBanner()
++(empty
+? '<div class="finish"><div class="bigth">ฟัง</div><h2>Nothing to play yet</h2><p>Listen mode plays phrases you have already learned — do a session or two first.</p></div>'
+: '<div class="teach" id="np" style="min-height:11rem"><span class="newtag">Ready</span><span class="en">English first, then the Thai twice.</span><span class="rom" style="font-size:1.2rem;color:var(--ink2)">Press play, pocket the phone, go lift.</span></div>'
++'<div class="lsncount" id="lc">'+LSN.ids.length+' phrases · shuffled</div>'
++'<div class="lsnrow"><button class="skipbtn" id="lsnstar" aria-label="Toggle starred only" style="font-size:1.1rem;font-weight:800">☆</button>'
++'<button class="ppbtn" id="pp" aria-label="Play">'+ICO.play+'</button>'
++'<button class="skipbtn" id="skip" aria-label="Skip">'+ICO.skipI+'</button></div>'
++'<p class="notice" style="text-align:center">Keeps your screen awake while playing — audio stops if the app is closed.</p>')
++'</div>';
+document.getElementById("quit").addEventListener("click",()=>{lsnStop();LSN=null;renderHome();});
+if(empty)return;
+const pp=document.getElementById("pp");
+pp.addEventListener("click",()=>{
+  if(LSN.playing){LSN.playing=false;LSN.gen++;speechSynthesis.cancel();lsnReleaseWake();pp.innerHTML=ICO.play;pp.setAttribute("aria-label","Play");}
+  else{LSN.playing=true;LSN.gen++;pp.innerHTML=ICO.pauseI;pp.setAttribute("aria-label","Pause");lsnLoop();}
+});
+document.getElementById("skip").addEventListener("click",()=>{
+  LSN.i++;if(LSN.i>=LSN.ids.length)LSN.i=0;
+  if(LSN.playing){LSN.gen++;LSN.playing=true;speechSynthesis.cancel();lsnLoop();}
+});
+document.getElementById("lsnstar").addEventListener("click",function(){
+  LSN.starOnly=!LSN.starOnly;this.textContent=LSN.starOnly?"★":"☆";this.style.color=LSN.starOnly?"var(--accent-deep)":"";
+  const was=LSN.playing;LSN.gen++;LSN.playing=false;speechSynthesis.cancel();
+  lsnBuild();
+  const lc=document.getElementById("lc");if(lc)lc.textContent=LSN.ids.length+" phrases · "+(LSN.starOnly?"starred only":"shuffled");
+  if(LSN.ids.length&&was){LSN.playing=true;LSN.gen++;lsnLoop();}
+});
 }
 
 /* ---------- placement ---------- */
