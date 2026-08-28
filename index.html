@@ -134,6 +134,16 @@ h1,h2,h3{font-family:var(--font-d); line-height:1.15; margin:0; text-wrap:balanc
 .skipbtn svg{width:20px; height:20px; fill:currentColor}
 .lsncount{text-align:center; font-size:.82rem; font-weight:700; color:var(--ink2); font-variant-numeric:tabular-nums}
 
+/* match game */
+.matchgrid{display:grid; grid-template-columns:1fr 1fr; gap:.6rem; align-items:stretch}
+.mcard{border:1.5px solid var(--line); background:var(--surface); border-radius:14px; padding:.65rem .55rem; text-align:center; font-weight:600; min-height:4rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.1rem; transition:opacity .25s}
+.mcard .mrom{font-family:var(--font-w); font-size:.95rem; line-height:1.25}
+.mcard .mth{font-family:var(--font-th); font-size:.78rem; color:var(--ink2)}
+.mcard .men{font-size:.92rem; line-height:1.25}
+.mcard.sel{border-color:var(--accent); background:var(--accent-soft)}
+.mcard.good{border-color:var(--good); background:var(--good-soft)}
+.mcard.badf{border-color:var(--bad); background:var(--bad-soft)}
+
 /* audio-pick exercise */
 .audioopt{display:flex; align-items:center; gap:.65rem; font-weight:700; color:var(--ink2)}
 .audioopt svg{width:18px; height:18px; fill:currentColor; flex-shrink:0}
@@ -555,7 +565,8 @@ gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8
 pauseI:'<svg viewBox="0 0 24 24"><path d="M7 4h4v16H7zM13 4h4v16h-4z"/></svg>',
 skipI:'<svg viewBox="0 0 24 24"><path d="M5 4l10 8-10 8zM17 4h3v16h-3z"/></svg>',
 prevI:'<svg viewBox="0 0 24 24"><path d="M19 4L9 12l10 8zM4 4h3v16H4z"/></svg>',
-phones:'<svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>'};
+phones:'<svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>',
+matchI:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2"/><path d="M11 7.5h4a2 2 0 0 1 2 2V13"/></svg>'};
 const TONE='<span class="tonelegend">tones: a mid &nbsp;·&nbsp; à low &nbsp;·&nbsp; â falling &nbsp;·&nbsp; á high &nbsp;·&nbsp; ǎ rising</span>';
 function isStar(id){return !!(S.ph[id]&&S.ph[id].star);}
 function starChip(id){const on=isStar(id);return '<button class="starchip'+(on?" on":"")+'" data-star="'+id+'">'+(on?"★ In frequent review":"☆ Review often")+'</button>';}
@@ -564,6 +575,17 @@ function isOff(id){return !!(S.ph[id]&&S.ph[id].off);}
 function offChip(id){const on=isOff(id);return '<button class="starchip'+(on?" offon":"")+'" data-off="'+id+'">'+(on?"Retired — tap to restore":"Retire this phrase")+'</button>';}
 function wireOffs(root){root.querySelectorAll("[data-off]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const id=+b.dataset.off;const st=P(id);st.off=!st.off;if(!st.off)st.due=todayStr();save();b.classList.toggle("offon",st.off);b.textContent=st.off?"Retired — tap to restore":"Retire this phrase";}));}
 const LSHORT=["Greetings","Numbers","Food","Transport","Shopping","Directions","Health","Small talk"];
+const N_TH=["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+const N_ROM=["sǔun","nùeng","sǎawng","sǎam","sìi","hâa","hòk","jèt","bpàaet","gâo"];
+function numParts(n){
+if(n===10000)return["หนึ่งหมื่น","nùeng mùuen"];
+if(n>=1000){const k=Math.floor(n/1000);return[N_TH[k]+"พัน",N_ROM[k]+" phan"];}
+if(n>=100){const h=Math.floor(n/100);let th=N_TH[h]+"ร้อย",rom=N_ROM[h]+" ráawy";const r=n%100;if(r){const s=numParts(r);th+=s[0];rom+=" "+s[1];}return[th,rom];}
+if(n>=10){const t=Math.floor(n/10);let th=t===2?"ยี่สิบ":(t===1?"สิบ":N_TH[t]+"สิบ");let rom=t===2?"yîi-sìp":(t===1?"sìp":N_ROM[t]+"-sìp");const u=n%10;if(u===1){th+="เอ็ด";rom+="-èt";}else if(u){th+=N_TH[u];rom+="-"+N_ROM[u];}return[th,rom];}
+return[N_TH[n],N_ROM[n]];
+}
+function genNum(n){const s=numParts(n);return{en:n.toLocaleString("en-US"),th:s[0],rom:s[1]};}
+const NUMLIST=(()=>{const a=[];for(let i=1;i<=100;i++)a.push(i);for(let h=200;h<=1000;h+=100)a.push(h);for(let k=2000;k<=10000;k+=1000)a.push(k);return a;})();
 function audioBtns(th,big){return '<div class="audiobtns"><button class="audiobtn'+(big?' big':'')+'" data-say="'+esc(th)+'">'+ICO.play+'Listen</button><button class="audiobtn'+(big?' big':'')+'" data-say="'+esc(th)+'" data-slow="1">'+ICO.play+'Slow</button></div>';}
 function wireAudio(root){root.querySelectorAll("[data-say]").forEach(b=>b.addEventListener("click",()=>speak(b.dataset.say,b.dataset.slow==="1")));}
 function navBar(cur){return '<nav class="nav"><div class="inner">'+[["home","Home",ICO.home],["book","Phrasebook",ICO.book],["gear","Settings",ICO.gear]].map(x=>'<button data-nav="'+x[0]+'" class="'+(cur===x[0]?"on":"")+'">'+x[2]+x[1]+'</button>').join("")+'</div></nav>';}
@@ -591,6 +613,7 @@ app.innerHTML='<div class="view">'
 +'<button class="bigbtn" id="startbtn">Start today’s session</button>'
 +'<div class="counts"><span>'+learned+' / '+total+' phrases learned</span><span>'+S.sessions+' sessions</span></div></div>'
 +'<button class="unitrow" id="lsnbtn"><span class="thglyph">'+ICO.phones+'</span><span class="uinfo"><span class="uname">Listen mode</span><br><span class="usub">Hands-free audio of your learned phrases — English, then the Thai twice</span></span><span class="uprog">'+learned+'</span></button>'
++'<button class="unitrow" id="matchbtn"><span class="thglyph">'+ICO.matchI+'</span><span class="uinfo"><span class="uname">Match game</span><br><span class="usub">Tap a Thai word to hear it, then find its meaning</span></span><span class="uprog">'+learned+'</span></button>'
 +'<div class="card"><div class="progressbar"><i style="width:'+Math.round(100*learned/total)+'%"></i></div>'
 +'<div class="pacenote">'+(onPace?'<b>On pace</b> for the trip':'<b class="behind">A little behind</b> — pace target is '+expected)+' · '+learned+' learned, target '+expected+' by today</div></div>'
 +'<div class="sectionlabel">Units</div>'
@@ -600,6 +623,7 @@ return '<button class="unitrow'+(i===au?" active":"")+'" data-unit="'+i+'"><span
 wireNav();
 document.getElementById("startbtn").addEventListener("click",()=>startSession());
 document.getElementById("lsnbtn").addEventListener("click",renderListen);
+document.getElementById("matchbtn").addEventListener("click",renderMatch);
 app.querySelectorAll("[data-unit]").forEach(b=>b.addEventListener("click",()=>{const u=+b.dataset.unit;
 if(dlgUnlocked(u)&&!S.dlg.includes(u))startDialogue(u);
 else if(introCount(u)<unitTotal(u))startSession(u);
@@ -821,21 +845,26 @@ function lsnAlive(my){return LSN&&LSN.gen===my&&LSN.playing;}
 async function lsnAcquireWake(){try{if(LSN&&navigator.wakeLock)LSN.wake=await navigator.wakeLock.request("screen");}catch(e){}}
 function lsnReleaseWake(){try{if(LSN&&LSN.wake){LSN.wake.release();LSN.wake=null;}}catch(e){}}
 if(typeof document!=="undefined")document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&LSN&&LSN.playing)lsnAcquireWake();});
-function lsnBuild(){LSN.ids=shuffle(PHRASES.filter(p=>S.ph[p.id]&&S.ph[p.id].intro&&!S.ph[p.id].off&&LSN.units.has(p.u)&&(!LSN.starOnly||isStar(p.id))).map(p=>p.id));LSN.i=0;}
+function lsnBuild(){let base=PHRASES.filter(p=>S.ph[p.id]&&S.ph[p.id].intro&&!S.ph[p.id].off&&LSN.units.has(p.u)&&(!LSN.starOnly||isStar(p.id))).map(p=>p.id);
+if(LSN.numOn&&!LSN.starOnly)base=base.concat(NUMLIST.map(n=>-n));
+LSN.ids=shuffle(base);LSN.i=0;}
 async function lsnLoop(){
 const my=LSN.gen;
 await lsnAcquireWake();
 while(lsnAlive(my)){
   if(!LSN.ids.length)break;
   if(LSN.i>=LSN.ids.length){LSN.ids=shuffle(LSN.ids);LSN.i=0;}
-  const p=PHRASES[LSN.ids[LSN.i]];
-  const np=document.getElementById("np"),lc=document.getElementById("lc");
+  const ent=LSN.ids[LSN.i];LSN.cur=ent;
+  const p=ent>=0?PHRASES[ent]:genNum(-ent);
+  const np=document.getElementById("np"),lc=document.getElementById("lc"),mc=document.getElementById("lsnmore");
   if(!np)break;
   np.innerHTML='<span class="newtag">Now playing</span><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>';
   if(lc)lc.textContent=(LSN.i+1)+" / "+LSN.ids.length;
+  if(mc){if(ent<0)mc.style.display="none";
+    else{mc.style.display="";const on=isStar(ent);mc.classList.toggle("on",on);mc.textContent=on?"★ In frequent review":"☆ Hear this phrase more often";}}
   speechSynthesis.cancel();
   await speakOnce(p.en.replace(/\s*\(.*?\)/g,"").replace(/…|\.{3}/g,""),"en-US",1);
-  if(!lsnAlive(my))break; await lsnWait(500);
+  if(!lsnAlive(my))break; await lsnWait(3000);
   const th=p.th.replace(/…|\.{3}/g,"").trim();
   await speakOnce(th,"th-TH",0.85);
   if(!lsnAlive(my))break; await lsnWait(600);
@@ -854,7 +883,8 @@ app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="
 +(empty
 ? '<div class="finish"><div class="bigth">ฟัง</div><h2>Nothing to play yet</h2><p>Listen mode plays phrases you have already learned — do a session or two first.</p></div>'
 : '<div class="teach" id="np" style="min-height:11rem"><span class="newtag">Ready</span><span class="en">English first, then the Thai twice.</span><span class="rom" style="font-size:1.2rem;color:var(--ink2)">Press play, pocket the phone, go lift.</span></div>'
-+'<div class="lsnunits" id="lu">'+UNITS.map((u,i)=>'<button class="uchip on" data-u="'+i+'">'+LSHORT[i]+'</button>').join("")+'<button class="uchip" id="lsnstar">★ starred only</button></div>'
++'<div class="lsnunits" id="lu">'+UNITS.map((u,i)=>'<button class="uchip on" data-u="'+i+'">'+LSHORT[i]+'</button>').join("")+'<button class="uchip" id="lsnnum">Numbers 1–10,000</button><button class="uchip" id="lsnstar">★ Review often</button></div>'
++'<div style="text-align:center;margin-top:.2rem"><button class="starchip" id="lsnmore" style="display:none">☆ Hear this phrase more often</button></div>'
 +'<div class="lsncount" id="lc">'+LSN.ids.length+' phrases · shuffled</div>'
 +'<div class="lsnrow"><button class="skipbtn" id="back" aria-label="Back one phrase">'+ICO.prevI+'</button>'
 +'<button class="ppbtn" id="pp" aria-label="Play">'+ICO.play+'</button>'
@@ -880,13 +910,25 @@ document.getElementById("skip").addEventListener("click",()=>{
 document.getElementById("back").addEventListener("click",()=>{
   if(!LSN.ids.length)return;
   LSN.i=(LSN.i-1+LSN.ids.length)%LSN.ids.length;
-  const id=LSN.ids[LSN.i];const st=P(id);
-  const cap=addDays(todayStr(),2);if(st.due>cap)st.due=cap;save();
+  const id=LSN.ids[LSN.i];
+  if(id>=0){const st=P(id);const cap=addDays(todayStr(),2);if(st.due>cap)st.due=cap;save();}
   LSN.ids.splice(Math.min(LSN.ids.length,LSN.i+5),0,id);
   restart(false);
 });
+document.getElementById("lsnmore").addEventListener("click",function(){
+  const ent=LSN.cur;if(ent===undefined||ent<0)return;
+  const st=P(ent);st.star=!st.star;
+  if(st.star){const cap=addDays(todayStr(),2);if(st.due>cap)st.due=cap;LSN.ids.splice(Math.min(LSN.ids.length,LSN.i+5),0,ent);}
+  save();
+  this.classList.toggle("on",st.star);this.textContent=st.star?"★ In frequent review":"☆ Hear this phrase more often";
+  if(LSN.starOnly&&!st.star)restart(true);
+});
 document.getElementById("lsnstar").addEventListener("click",function(){
   LSN.starOnly=!LSN.starOnly;this.classList.toggle("on",LSN.starOnly);
+  restart(true);
+});
+document.getElementById("lsnnum").addEventListener("click",function(){
+  LSN.numOn=!LSN.numOn;this.classList.toggle("on",LSN.numOn);
   restart(true);
 });
 document.querySelectorAll("#lu [data-u]").forEach(b=>b.addEventListener("click",()=>{
@@ -894,6 +936,73 @@ document.querySelectorAll("#lu [data-u]").forEach(b=>b.addEventListener("click",
   if(LSN.units.has(u))LSN.units.delete(u);else LSN.units.add(u);
   b.classList.toggle("on",LSN.units.has(u));
   restart(true);
+}));
+}
+
+/* ---------- match game ---------- */
+let MG=null;
+function renderMatch(){
+const pool=PHRASES.filter(p=>S.ph[p.id]&&S.ph[p.id].intro&&!S.ph[p.id].off).map(p=>p.id);
+if(pool.length<6){
+  app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div style="flex:1;font-family:var(--font-d);font-weight:700">Match game</div></div>'
+  +'<div class="finish"><div class="bigth">จับคู่</div><h2>Not enough phrases yet</h2><p>The match game uses phrases you have already learned — do a session or two first.</p></div></div>';
+  document.getElementById("quit").addEventListener("click",renderHome);return;
+}
+MG={pool,queue:shuffle(pool.slice()),board:[],sel:-1,score:0,miss:0,busy:false};
+MG.board=MG.queue.splice(0,5);
+MG.rorder=shuffle([0,1,2,3,4]);
+app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div style="flex:1;font-family:var(--font-d);font-weight:700">Match game</div><div class="streakchip" id="mscore"></div></div>'
++'<p class="notice" style="margin:0">Tap a Thai word to hear it, then tap its English meaning.</p>'
++'<div class="matchgrid" id="mgrid"></div></div>';
+document.getElementById("quit").addEventListener("click",()=>{MG=null;renderHome();});
+mgDraw();
+}
+function mgNext(){
+const i=MG.queue.findIndex(id=>!MG.board.includes(id));
+if(i>=0)return MG.queue.splice(i,1)[0];
+MG.queue=MG.queue.concat(shuffle(MG.pool.filter(id=>!MG.board.includes(id))));
+return MG.queue.splice(MG.queue.findIndex(id=>!MG.board.includes(id)),1)[0];
+}
+function mgDraw(){
+if(!MG)return;
+document.getElementById("mscore").textContent=MG.score+" matched · "+MG.miss+" missed";
+const g=document.getElementById("mgrid");
+let html="";
+for(let r=0;r<5;r++){
+  const li=MG.board[r],ri=MG.board[MG.rorder[r]];
+  const lp=PHRASES[li],rp=PHRASES[ri];
+  html+='<button class="mcard'+(MG.sel===r?" sel":"")+'" data-l="'+r+'"><span class="mrom">'+esc(lp.rom)+'</span><span class="mth">'+esc(lp.th)+'</span></button>';
+  html+='<button class="mcard" data-r="'+MG.rorder[r]+'"><span class="men">'+esc(rp.en)+'</span></button>';
+}
+g.innerHTML=html;
+g.querySelectorAll("[data-l]").forEach(b=>b.addEventListener("click",()=>{
+  if(MG.busy)return;
+  const slot=+b.dataset.l;
+  speak(PHRASES[MG.board[slot]].th,false);
+  MG.sel=slot;
+  g.querySelectorAll("[data-l]").forEach(x=>x.classList.toggle("sel",+x.dataset.l===slot));
+}));
+g.querySelectorAll("[data-r]").forEach(b=>b.addEventListener("click",()=>{
+  if(MG.busy||MG.sel<0)return;
+  const rslot=+b.dataset.r,lslot=MG.sel;
+  const lcard=g.querySelector('[data-l="'+lslot+'"]');
+  MG.busy=true;
+  if(rslot===lslot){
+    MG.score++;
+    b.classList.add("good");lcard.classList.add("good");lcard.classList.remove("sel");
+    setTimeout(()=>{if(!MG)return;MG.board[lslot]=mgNext();MG.sel=-1;MG.busy=false;mgDraw();},450);
+  }else{
+    MG.miss++;
+    const id=MG.board[lslot];
+    b.classList.add("badf");lcard.classList.add("badf");lcard.classList.remove("sel");
+    g.querySelector('[data-r="'+lslot+'"]').classList.add("good");
+    const st=P(id);const cap=addDays(todayStr(),1);if(st.due>cap)st.due=cap;save();
+    setTimeout(()=>{if(!MG)return;
+      MG.board[lslot]=mgNext();
+      MG.queue.splice(Math.min(MG.queue.length,3),0,id);
+      MG.queue.splice(Math.min(MG.queue.length,9),0,id);
+      MG.sel=-1;MG.busy=false;mgDraw();},1200);
+  }
 }));
 }
 
