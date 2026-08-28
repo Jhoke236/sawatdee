@@ -807,7 +807,12 @@ function bubbleMe(o){return '<div class="bubble me"><span class="brom">'+esc(o[0
 function step(){
   if(i>=d.steps.length){
     if(!S.dlg.includes(u))S.dlg.push(u);save();
-    app.innerHTML='<div class="fullview"><div class="finish"><div class="bigth">จบ!</div><h2>Scene complete</h2><p>'+esc(d.t)+' · '+(mistakes===0?"flawless!":mistakes+" retr"+(mistakes>1?"ies":"y"))+'</p></div><button class="checkbtn" id="cont">Back home</button></div>';
+    const usedPh=[];d.steps.forEach(stp=>{if(!stp.c){const o=stp.o.find(x=>x[2]);const ph=o&&PHRASES.find(p=>p.rom===o[0]);if(ph&&!usedPh.includes(ph))usedPh.push(ph);}});
+    app.innerHTML='<div class="fullview"><div class="finish" style="flex:0;padding:1.2rem 0"><div class="bigth">จบ!</div><h2>Scene complete</h2><p>'+esc(d.t)+' · '+(mistakes===0?"flawless!":mistakes+" retr"+(mistakes>1?"ies":"y"))+'</p></div>'
+    +(usedPh.length?'<div class="card"><div class="sectionlabel" style="margin:0 0 .4rem">Phrases from this scene</div>'
+      +usedPh.map(ph=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line)"><button data-say="'+esc(ph.th)+'" style="text-align:left;flex:1"><span style="font-family:var(--font-w);font-weight:600">'+esc(ph.rom)+'</span><br><span style="font-size:.78rem;color:var(--ink2)">'+esc(ph.en)+'</span></button>'+starChip(ph.id)+'</div>').join("")+'</div>':"")
+    +'<button class="checkbtn" id="cont">Back home</button></div>';
+    wireAudio(app);wireStars(app);
     document.getElementById("cont").addEventListener("click",renderHome);return;
   }
   const st=d.steps[i];
@@ -953,16 +958,21 @@ MG.board=MG.queue.splice(0,5);
 MG.rorder=shuffle([0,1,2,3,4]);
 app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div style="flex:1;font-family:var(--font-d);font-weight:700">Match game</div><div class="streakchip" id="mscore"></div></div>'
 +'<p class="notice" style="margin:0">Tap a Thai word to hear it, then tap its English meaning.</p>'
-+'<div class="matchgrid" id="mgrid"></div></div>';
++'<div class="matchgrid" id="mgrid"></div><div id="mlast"></div></div>';
 document.getElementById("quit").addEventListener("click",()=>{MG=null;renderHome();});
 mgDraw();
 }
 function mgNext(){
-const i=MG.queue.findIndex(id=>!MG.board.includes(id));
+const fit=id=>!MG.board.includes(id)&&!isOff(id);
+const i=MG.queue.findIndex(fit);
 if(i>=0)return MG.queue.splice(i,1)[0];
-MG.queue=MG.queue.concat(shuffle(MG.pool.filter(id=>!MG.board.includes(id))));
-return MG.queue.splice(MG.queue.findIndex(id=>!MG.board.includes(id)),1)[0];
+MG.queue=MG.queue.concat(shuffle(MG.pool.filter(fit)));
+const j=MG.queue.findIndex(fit);
+return j>=0?MG.queue.splice(j,1)[0]:MG.board[0];
 }
+function mgLast(id,good){const p=PHRASES[id];const el=document.getElementById("mlast");if(!el)return;
+el.innerHTML='<div class="feedback '+(good?"good":"bad")+'"><span class="fbrom">'+esc(p.rom)+'</span> — '+esc(p.en)+'</div><div class="chiprow">'+starChip(id)+offChip(id)+'</div>';
+wireStars(el);wireOffs(el);}
 function mgDraw(){
 if(!MG)return;
 document.getElementById("mscore").textContent=MG.score+" matched · "+MG.miss+" missed";
@@ -989,11 +999,12 @@ g.querySelectorAll("[data-r]").forEach(b=>b.addEventListener("click",()=>{
   MG.busy=true;
   if(rslot===lslot){
     MG.score++;
+    const id=MG.board[lslot];mgLast(id,true);
     b.classList.add("good");lcard.classList.add("good");lcard.classList.remove("sel");
     setTimeout(()=>{if(!MG)return;MG.board[lslot]=mgNext();MG.sel=-1;MG.busy=false;mgDraw();},450);
   }else{
     MG.miss++;
-    const id=MG.board[lslot];
+    const id=MG.board[lslot];mgLast(id,false);
     b.classList.add("badf");lcard.classList.add("badf");lcard.classList.remove("sel");
     g.querySelector('[data-r="'+lslot+'"]').classList.add("good");
     const st=P(id);const cap=addDays(todayStr(),1);if(st.due>cap)st.due=cap;save();
@@ -1018,12 +1029,13 @@ function step(){
   app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div class="progressbar"><i style="width:'+Math.round(100*i/ids.length)+'%"></i></div></div>'
   +'<div class="exprompt">Memory check '+(i+1)+' of '+ids.length+' — does this ring a bell?</div>'
   +'<div class="teach"><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)
-  +'<div id="reveal" style="display:none"><span class="en" style="font-size:1.15rem;font-weight:700;color:var(--ink)">'+esc(p.en)+'</span>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'</div></div>'
+  +'<div id="reveal" style="display:none"><span class="en" style="font-size:1.15rem;font-weight:700;color:var(--ink)">'+esc(p.en)+'</span>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+'</div></div></div>'
   +'<div id="btns" style="margin-top:auto"><button class="checkbtn" id="show">Show meaning</button></div></div>';
   wireAudio(app);speak(p.th,false);
   document.getElementById("quit").addEventListener("click",()=>{S.placed=true;save();renderHome();});
   document.getElementById("show").addEventListener("click",()=>{
     document.getElementById("reveal").style.display="block";
+    wireStars(app);wireOffs(app);
     document.getElementById("btns").innerHTML='<div class="btnrow"><button class="checkbtn secondary" id="no" style="margin-top:0">Not yet</button><button class="checkbtn" id="yes" style="margin-top:0">I knew it</button></div>';
     document.getElementById("yes").addEventListener("click",()=>{const st=P(p.id);st.intro=true;st.lv=3;st.due=addDays(todayStr(),4);knew++;save();i++;step();});
     document.getElementById("no").addEventListener("click",()=>{i++;step();});
