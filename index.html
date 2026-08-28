@@ -677,7 +677,7 @@ else{promptHtml='<div class="exprompt">Listen — which one did you hear?</div>'
   optHtml=opts.map(o=>'<button class="opt" data-th="'+esc(o.th)+'" data-ok="'+(o.id===p.id?1:0)+'"><span class="rom">'+esc(o.rom)+'</span></button>').join("");}
 app.innerHTML='<div class="fullview">'+top+'<div class="exwrap">'+promptHtml+'<div class="opts">'+optHtml+'</div><div id="fb"></div></div><button class="checkbtn" id="cont" disabled>Continue</button></div>';
 wireCommon();
-if(mode==="listen2en"||mode==="listen2rom")setTimeout(()=>speak(p.th,false),250);
+if(mode==="listen2en"||mode==="listen2rom"||mode==="rom2en")setTimeout(()=>speak(p.th,false),250);
 let answered=false;
 app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
   if(answered){speak(b.dataset.th,false);return;}
