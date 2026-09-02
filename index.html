@@ -164,6 +164,19 @@ h1,h2,h3{font-family:var(--font-d); line-height:1.15; margin:0; text-wrap:balanc
 .uchip{font-family:var(--font-ui); font-weight:700; font-size:.78rem; border:1.5px solid var(--line); border-radius:999px; padding:.3rem .7rem; color:var(--ink2)}
 .uchip.on{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-deep)}
 
+/* break it down */
+.bdwrap{width:100%; display:flex; flex-direction:column; gap:.5rem; margin-top:.5rem}
+.wchips{display:flex; flex-wrap:wrap; gap:.4rem}
+.wchip{font-family:var(--font-w); font-weight:600; font-size:.95rem; background:var(--surface2); border:1.5px solid var(--line); border-radius:10px; padding:.4rem .65rem; display:flex; flex-direction:column; align-items:center; gap:.05rem; line-height:1.25}
+.wchip .wth{font-family:var(--font-th); font-size:.78rem; color:var(--ink2); font-weight:400}
+.wchip.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-deep)}
+.wchip.sep{background:none; border:none; padding:.4rem .1rem; color:var(--ink2)}
+.wdef{background:var(--surface2); border-radius:12px; padding:.6rem .8rem; font-size:.9rem; width:100%; text-align:left}
+.wdef .wrom{font-family:var(--font-w); font-weight:700; font-size:1.05rem}
+.wdef .wth{font-family:var(--font-th); color:var(--accent-deep); margin-left:.45rem; font-size:1.05rem}
+.wdef .wnote{color:var(--ink2); font-size:.82rem; margin-top:.25rem}
+.wdef.hint{color:var(--ink2); font-size:.82rem}
+
 /* unscramble */
 .buildrow{min-height:3.2rem; display:flex; flex-wrap:wrap; gap:.45rem; border-bottom:2px solid var(--line); padding-bottom:.6rem}
 .bank{display:flex; flex-wrap:wrap; gap:.45rem}
@@ -228,8 +241,12 @@ const UNITS=[
 {n:"Shopping",th:"ซื้อของ",g:"๕",d:"Markets and the gentle art of the discount"},
 {n:"Directions & Time",th:"ถามทาง",g:"๖",d:"Find your way — and tell the time"},
 {n:"Health & Emergencies",th:"ฉุกเฉิน",g:"๗",d:"Pharmacy runs and lost passports"},
-{n:"Small Talk",th:"คุยเล่น",g:"๘",d:"Make friends, give compliments, be sà-baai"}
+{n:"Small Talk",th:"คุยเล่น",g:"๘",d:"Make friends, give compliments, be sà-baai"},
+{n:"Pronouns & People",th:"สรรพนาม",g:"๙",d:"I, you, he, she — and who's who in a Thai crowd"}
 ];
+// Learning / display order of units. New units are appended to UNITS and RAW (phrase ids must stay stable), then slotted in here.
+const UORDER=[0,8,1,2,3,4,5,6,7];
+function uGlyph(u){return "๑๒๓๔๕๖๗๘๙๑๐"[UORDER.indexOf(u)]||"";}
 // [english, thai, romanization, note?, placement?]
 const RAW=[
 [
@@ -473,6 +490,37 @@ const RAW=[
 ["so tasty! (Isaan slang)","แซ่บ!","sâaep!","Isaan slang — deploy it over som tam and collect grins."],
 ["take it easy / chill","สบายๆ","sà-baai sà-baai","The Thai philosophy in two syllables."],
 ["Amazing!","สุดยอด!","sùt-yâawt!","Literally \"the utmost peak!\""]
+],[
+["I / me (female speaker)","ฉัน","chǎn","Thai pronouns don't change shape — chǎn is both I and me. Women use it in everyday polite speech.",1],
+["I / me (formal, female)","ดิฉัน","dì-chǎn","The extra-polite version — for officials, formal settings, or first meetings with elders."],
+["you","คุณ","khun","Polite and safe with anyone. Also a title before a name: khun Nok = Ms. or Mr. Nok.",1],
+["he / him / she / her","เขา","khǎo","In everyday speech khǎo covers he, him, she, her — and they. One word does all the work.",1],
+["she / her (also casual 'you')","เธอ","thooe","Common in writing and songs. Between close friends it also means 'you'."],
+["we / us","เรา","rao","Also a casual, friendly 'I' — you'll hear Thais say rao about themselves all the time."],
+["we / us (all of us)","พวกเรา","phûak-rao","phûak = group. Adds an 'all of us' feel."],
+["they / them","พวกเขา","phûak-khǎo","phûak (group) + khǎo (he / she) = they."],
+["it","มัน","man","For things and animals. Calling a person man is rude — use khǎo."],
+["my / mine","ของฉัน","khǎawng chǎn","khǎawng = 'of / belonging to'. Every possessive is just khǎawng + pronoun."],
+["your / yours","ของคุณ","khǎawng khun"],
+["his / hers / theirs","ของเขา","khǎawng khǎo"],
+["our / ours","ของเรา","khǎawng rao"],
+["myself / on my own","ฉันเอง","chǎn eeng","eeng after any pronoun = -self. Also the answer to 'who's there?' — chǎn eeng, it's me."],
+["this / that","นี่ / นั่น","nîi / nân","Standalone pointers: nîi à-rai = what's this? After a noun they become níi / nán: an-níi = this one."],
+["who?","ใคร","khrai","Doubles as 'anyone': mii khrai mǎi = is anyone there?"],
+["Who is that?","นั่นใครคะ","nân khrai khá"],
+["everyone","ทุกคน","thúk khon","thúk = every, khon = person."],
+["nobody","ไม่มีใคร","mâi mii khrai","Literally 'not have anyone'."],
+["person / people","คน","khon","Also the counting word for people: sǎawng khon = two people."],
+["friend","เพื่อน","phûuean"],
+["This is my friend","นี่เพื่อนของฉันค่ะ","nîi phûuean khǎawng chǎn khâ","No word for 'is' needed — Thai just lines the words up."],
+["older person (polite address)","พี่","phîi","Literally 'older sibling'. The warm way to address anyone a bit older — waiters, drivers, shop owners.",1],
+["younger person (polite address)","น้อง","náawng","Literally 'younger sibling'. The friendly way to call over young staff."],
+["mother","แม่","mâae"],
+["father","พ่อ","phâaw"],
+["It's mine","ของฉันค่ะ","khǎawng chǎn khâ"],
+["Is this yours?","อันนี้ของคุณไหมคะ","an-níi khǎawng khun mǎi khá"],
+["I'm here with my partner","มากับแฟนค่ะ","maa gàp faaen khâ","gàp = with. Thai drops 'I' when it's obvious who's talking."],
+["Me too","ฉันด้วยค่ะ","chǎn dûai khâ","dûai = also / too. Handy at the table: 'me too, please'."]
 ]];
 const PHRASES=[];RAW.forEach((arr,u)=>arr.forEach(r=>PHRASES.push({id:PHRASES.length,u,en:r[0],th:r[1],rom:r[2],note:r[3]||"",p:!!r[4]})));
 const DIALOGUES=[
@@ -529,8 +577,299 @@ const DIALOGUES=[
 {q:"Share your story — you spoke Thai as a kid",o:[["dtaawn dèk chǎn phûut thai dâai khâ","I spoke Thai as a kid",1],["chǎn aa-yú yîi-sìp bpii","I'm twenty years old",0],["faaen khǎawng chǎn","My partner",0]]},
 {n:["สุดยอดเลย!","sùt-yâawt looei!","That's amazing!"],q:"Tell her Thailand is beautiful",o:[["mueang-thai sǔai mâak khâ","Thailand is so beautiful",1],["wan-níi ráawn mâak!","It's so hot today!",0],["fǒn dtòk","It's raining",0]]},
 {q:"Ask her to take a photo of you two",o:[["thàai-rûup hâi nàwy dâai mǎi khá","Can you take a photo for me?",1],["thàai-rûup dâai mǎi khá","Can I take a photo?",0],["wâai-náam","Swim",0]]},
-{q:"Say goodbye — see you later!",o:[["láaeo jooe gan khâ","See you later!",1],["jing rǒoe","Really?",0],["láaw-lên","Just kidding",0]]}]}
+{q:"Say goodbye — see you later!",o:[["láaeo jooe gan khâ","See you later!",1],["jing rǒoe","Really?",0],["láaw-lên","Just kidding",0]]}]},
+{t:"Coffee with new friends",s:"A café in Chiang Mai. The owner pulls up a chair and gets curious.",steps:[
+{n:["สวัสดีค่ะ มากับใครคะ","sà-wàt-dii khâ, maa gàp khrai khá","Hello! Who are you here with?"],q:"You're here with your partner",o:[["maa gàp faaen khâ","I'm here with my partner",1],["maa thîao khâ","I'm here on vacation",0],["chǎn eeng khâ","Just me",0]]},
+{n:["แล้วคนนั้นล่ะคะ","láaeo khon nán lâ khá","And that person?"],q:"Introduce your friend",o:[["nîi phûuean khǎawng chǎn khâ","This is my friend",1],["nân khrai khá","Who is that?",0],["khǎawng khun khâ","It's yours",0]]},
+{n:["เขาพูดไทยได้ไหมคะ","khǎo phûut thai dâai mǎi khá",""],c:1,q:"What did she ask?",o:[["Can your friend speak Thai?",1],["Is your friend hungry?",0],["Where is your friend from?",0]]},
+{q:"Your friend can't — but you can, a little",o:[["khǎo mâi dâai khâ, chǎn dâai nít-nàwy","They can't — I can, a little",1],["thúk khon phûut dâai khâ","Everyone can",0],["mâi mii khrai khâ","Nobody",0]]},
+{n:["กระเป๋าใบนี้ของใครคะ","grà-bpǎo bai níi khǎawng khrai khá","Whose bag is this?"],q:"That's yours — claim it",o:[["khǎawng chǎn khâ","It's mine",1],["khǎawng khun khâ","It's yours",0],["khǎawng khǎo khâ","It's theirs",0]]},
+{q:"Thank her warmly — she's a little older, so call her phîi",o:[["khàawp-khun khâ phîi","Thank you, phîi",1],["khàawp-khun khâ náawng","Thank you, náawng",0],["khàawp-khun khâ mâae","Thank you, mom",0]]}]}
 ];
+/* ---------- word glossary (for "Break this down") ---------- */
+const GLOSS={
+"aa-gàat":["อากาศ","weather / air"],
+"aa-hǎan":["อาหาร","food"],
+"aa-yú":["อายุ","age"],
+"an":["อัน","one / piece (counting word for small things)","Thai counts with classifiers: sǎawng an = two (of them)."],
+"an-nán":["อันนั้น","that one"],
+"an-níi":["อันนี้","this one"],
+"ang-grìt":["อังกฤษ","English / England"],
+"ao":["เอา","to take / want","At a shop or stall, ao = I'll have it."],
+"bia":["เบียร์","beer"],
+"bpai":["ไป","to go","After an adjective it means \"too\": phaaeng bpai = too expensive."],
+"bpen":["เป็น","to be / to have (an illness)"],
+"bpii":["ปี","year"],
+"bplaa":["ปลา","fish"],
+"bplaae":["แปล","to translate / to mean"],
+"bpàaet":["แปด","eight"],
+"bpìt":["ปิด","to close / turn off"],
+"bpòoet":["เปิด","to open / turn on"],
+"bpùat":["ปวด","to ache"],
+"bàat":["บาท","baht"],
+"bàt":["บัตร","card"],
+"chaa-yen":["ชาเย็น","Thai iced tea","chaa = tea, yen = cold."],
+"chaai-hàat":["ชายหาด","beach"],
+"chon":["ชน","to clink / bump into"],
+"cháa-cháa":["ช้าๆ","slowly","Doubling a word softens it: \"slow-slow\"."],
+"cháao":["เช้า","morning"],
+"chái":["ใช้","to use / to take (time)"],
+"châawp":["ชอบ","to like"],
+"châi":["ใช่","yes / that's right"],
+"chék-bin":["เช็คบิล","check, please","Borrowed from English \"check bill\"."],
+"chíi":["ชี้","to point"],
+"chôok-dii":["โชคดี","good luck","chôok = luck, dii = good."],
+"chùk-chǒoen":["ฉุกเฉิน","emergency"],
+"chûai":["ช่วย","to help","Opens a polite request: chûai … = please help me…"],
+"chûue":["ชื่อ","name / to be named"],
+"chǎn":["ฉัน","I / me (female speaker)","Thai pronouns don't change shape: chǎn is both I and me."],
+"chǒoei-chǒoei":["เฉยๆ","just / casually (no particular reason)"],
+"dii":["ดี","good"],
+"dii-jai":["ดีใจ","happy / glad","Literally \"good heart\"."],
+"dooen":["เดิน","to walk"],
+"doon":["โดน","to get hit by / to suffer (something bad)"],
+"dtaawn":["ตอน","time / period","dtaawn dèk = when (I was) a child."],
+"dtaawn-níi":["ตอนนี้","now"],
+"dtam-rùat":["ตำรวจ","police"],
+"dtrong":["ตรง","straight / exactly at"],
+"dtrong-khâam":["ตรงข้าม","opposite / across from"],
+"dtrong-níi":["ตรงนี้","right here"],
+"dtà-làat":["ตลาด","market"],
+"dtòk":["ตก","to fall"],
+"dtúk-dtúk":["ตุ๊กตุ๊ก","tuk-tuk"],
+"dtûu":["ตู้","cabinet / booth / machine"],
+"dtǔa":["ตั๋ว","ticket"],
+"duu":["ดู","to look / to watch"],
+"dàaet":["แดด","sunshine"],
+"dâai":["ได้","can / able to","After a verb it means \"can\". dâai mǎi = can you?"],
+"dèk":["เด็ก","child"],
+"dùuem":["ดื่ม","to drink"],
+"dûai":["ด้วย","too / also / as well","Softens requests: \"…for me as well\"."],
+"ee-thii-em":["เอทีเอ็ม","ATM"],
+"faaen":["แฟน","partner / boyfriend / girlfriend"],
+"frii":["ฟรี","free (no charge)"],
+"fǎn-dii":["ฝันดี","sweet dreams","fǎn = dream, dii = good."],
+"fǒn":["ฝน","rain"],
+"gaa-faae":["กาแฟ","coffee"],
+"gaaeng":["แกง","curry"],
+"gaang-geeng":["กางเกง","pants / trousers"],
+"gam-lang":["กำลัง","currently / in the middle of (-ing)"],
+"gan":["กัน","together / each other","In yaa gan yung it is a different gan: \"to prevent\"."],
+"gin":["กิน","to eat"],
+"glai":["ไกล","far","Mid tone. Compare glâi (falling) = near."],
+"glàwng":["กล่อง","box"],
+"glâi":["ใกล้","near","Falling tone. Compare glai (mid) = far."],
+"grà-bpǎo":["กระเป๋า","bag"],
+"grà-bpǎo-dtang":["กระเป๋าตังค์","wallet","Literally \"money bag\"."],
+"gwàa":["กว่า","more than / -er","Makes comparisons: yài gwàa = bigger."],
+"gài":["ไก่","chicken"],
+"gàw":["เกาะ","island"],
+"gâaeo":["แก้ว","glass"],
+"gâo":["เก้า","nine"],
+"gìi":["กี่","how many"],
+"gûng":["กุ้ง","shrimp"],
+"gǔai-dtǐao":["ก๋วยเตี๋ยว","rice noodles"],
+"hàaw":["ห่อ","to wrap"],
+"hâa":["ห้า","five"],
+"hâa-sìp":["ห้าสิบ","fifty"],
+"hâi":["ให้","to give / for (someone)","In requests: do it for me."],
+"hâwng":["ห้อง","room"],
+"hâwng-náam":["ห้องน้ำ","bathroom","Literally \"water room\"."],
+"hòk":["หก","six"],
+"hǎa":["หา","to look for / to go see (a doctor)"],
+"hǎai":["หาย","lost / disappeared"],
+"hǐu":["หิว","hungry"],
+"hǔa":["หัว","head"],
+"jee":["เจ","vegetarian (Buddhist style, no meat, no eggs)"],
+"jing":["จริง","true / real"],
+"jooe":["เจอ","to meet / to find"],
+"jàai":["จ่าย","to pay"],
+"jàak":["จาก","from"],
+"jàawt":["จอด","to park / to pull over"],
+"jèp":["เจ็บ","to hurt"],
+"jèt":["เจ็ด","seven"],
+"khriim":["ครีม","cream"],
+"khráng":["ครั้ง","time (occurrence)","ìik khráng = one more time."],
+"khun":["คุณ","you","Also a title before a name: khun Nok."],
+"khwǎa":["ขวา","right (side)"],
+"khà-mooi":["ขโมย","to steal / thief"],
+"khàawp-khun":["ขอบคุณ","thank you"],
+"khài":["ไข่","egg"],
+"khá":["คะ","polite particle for questions (female)","High tone. Ends a question politely."],
+"khâ":["ค่ะ","polite particle for statements (female)","Falling tone. Ends a statement politely; on its own it means \"yes\"."],
+"khâao":["ข้าว","rice / a meal"],
+"khâao-nǐao":["ข้าวเหนียว","sticky rice"],
+"khâao-phàt":["ข้าวผัด","fried rice"],
+"khâi":["ไข้","fever"],
+"khâo-jai":["เข้าใจ","to understand","Literally \"enter the heart\"."],
+"khǎai":["ขาย","to sell"],
+"khǎaw":["ขอ","may I have / please give","The polite request word for ordering anything."],
+"khǎaw-thôot":["ขอโทษ","sorry / excuse me"],
+"khǎawng":["ของ","of / belonging to","Links owner and thing: khǎawng chǎn = mine."],
+"khǎawng-fàak":["ของฝาก","souvenirs / gifts to bring home"],
+"khǐao-wǎan":["เขียวหวาน","green-sweet (the curry's name)"],
+"laa-gàawn":["ลาก่อน","goodbye"],
+"laawng":["ลอง","to try"],
+"láaeo":["แล้ว","already / and then","Marks something finished: ìm láaeo = full already."],
+"láaw-lên":["ล้อเล่น","to joke / to tease"],
+"lâ":["ล่ะ","and what about…? (particle)"],
+"lék":["เล็ก","small"],
+"líao":["เลี้ยว","to turn"],
+"lót":["ลด","to reduce / to discount"],
+"lǒng":["หลง","to be lost / to stray"],
+"maa":["มา","to come"],
+"maw-dtooe-sai":["มอเตอร์ไซค์","motorbike"],
+"mee-nuu":["เมนู","menu"],
+"mii":["มี","to have / there is"],
+"moong":["โมง","o'clock"],
+"mueang-thai":["เมืองไทย","Thailand","mueang = city / country."],
+"má-mûang":["มะม่วง","mango"],
+"má-phráao":["มะพร้าว","coconut"],
+"mâak":["มาก","very / a lot"],
+"mâi":["ไม่","not / no","Falling tone. Put it before a verb to negate it."],
+"mí-dtooe":["มิเตอร์","meter"],
+"mûuea-waan":["เมื่อวาน","yesterday"],
+"mǎaw":["หมอ","doctor"],
+"mǎi":["ไหม","question particle (yes / no)","Turns a statement into a question."],
+"mǔu":["หมู","pork / pig"],
+"naan":["นาน","long (time)"],
+"ngoen":["เงิน","money / silver"],
+"ngoen-sòt":["เงินสด","cash"],
+"ngûang":["ง่วง","sleepy"],
+"nàwy":["หน่อย","a little / a bit","Softens requests: \"…a little, please\"."],
+"náam":["น้ำ","water"],
+"náam-dtaan":["น้ำตาล","sugar"],
+"náam-khǎeng":["น้ำแข็ง","ice","Literally \"hard water\"."],
+"nát":["นัด","appointment / scheduled","dtà-làat nát = a market that meets on set days."],
+"nâa-rák":["น่ารัก","cute","Literally \"worth loving\"."],
+"níi":["นี้","this (after a noun)","an-níi = this one, wan-níi = today."],
+"nít-nàwy":["นิดหน่อย","a little bit"],
+"nîi":["นี่","this (standalone)"],
+"nùeai":["เหนื่อย","tired"],
+"nùeng":["หนึ่ง","one"],
+"núea":["เนื้อ","beef / meat"],
+"nǎi":["ไหน","where / which"],
+"oo-khee":["โอเค","okay"],
+"phaa-sǎa":["ภาษา","language"],
+"phaa-sǎa-thai":["ภาษาไทย","Thai language"],
+"phaaeng":["แพง","expensive"],
+"phan":["พัน","thousand"],
+"phláat-sà-dtooe":["พลาสเตอร์","band-aid / plaster"],
+"phrûng-níi":["พรุ่งนี้","tomorrow"],
+"phàk":["ผัก","vegetables"],
+"phàk-chii":["ผักชี","cilantro / coriander"],
+"phàt-thai":["ผัดไทย","pad thai","phàt = stir-fried."],
+"pháae":["แพ้","allergic to / to lose"],
+"pháat-sà-bpàawt":["พาสปอร์ต","passport"],
+"phèt":["เผ็ด","spicy"],
+"phûut":["พูด","to speak"],
+"phǎaen-thîi":["แผนที่","map"],
+"raa-khaa":["ราคา","price"],
+"raaw":["รอ","to wait"],
+"raawng-tháo":["รองเท้า","shoes"],
+"rai":["ไร","anything","mâi bpen rai = it's nothing / no worries."],
+"rian":["เรียน","to study / to learn"],
+"roong-phá-yaa-baan":["โรงพยาบาล","hospital"],
+"roong-raaem":["โรงแรม","hotel"],
+"ruea":["เรือ","boat"],
+"rá-wang":["ระวัง","careful"],
+"ráan":["ร้าน","shop"],
+"ráawn":["ร้อน","hot"],
+"ráawy":["ร้อย","hundred"],
+"rák":["รัก","to love"],
+"ráp":["รับ","to accept / to receive"],
+"rîak":["เรียก","to call"],
+"rót-fai":["รถไฟ","train","Literally \"fire vehicle\"."],
+"rót-fai-fáa":["รถไฟฟ้า","skytrain","Literally \"electric train\"."],
+"rót-mee":["รถเมล์","bus"],
+"rúu-jàk":["รู้จัก","to know (a person or place)"],
+"rǒoe":["เหรอ","really? (particle)"],
+"saawy":["ซอย","alley / side street"],
+"see-wên":["เซเว่น","7-Eleven"],
+"sà-baai":["สบาย","comfortable / well / relaxed"],
+"sà-baai-dii":["สบายดี","fine / well"],
+"sà-nùk":["สนุก","fun"],
+"sà-nǎam-bin":["สนามบิน","airport","Literally \"flying field\"."],
+"sà-thǎa-nii":["สถานี","station"],
+"sà-thǎan-thûut":["สถานทูต","embassy"],
+"sà-wàt-dii":["สวัสดี","hello / goodbye"],
+"sài":["ใส่","to put in / to add / to wear"],
+"sàk-khrûu":["สักครู่","a moment"],
+"sáai":["ซ้าย","left (side)"],
+"sâaep":["แซ่บ","delicious (Isaan slang)"],
+"sìi":["สี่","four"],
+"sìi-yâaek":["สี่แยก","intersection","Literally \"four-way split\"."],
+"sìp":["สิบ","ten"],
+"sìp-èt":["สิบเอ็ด","eleven"],
+"sôm-dtam":["ส้มตำ","papaya salad"],
+"sùt-tháai":["สุดท้าย","last / final"],
+"sùt-yâawt":["สุดยอด","awesome / the utmost"],
+"súue":["ซื้อ","to buy"],
+"sûuea":["เสื้อ","shirt"],
+"sûuea-phâa":["เสื้อผ้า","clothes"],
+"sǎam":["สาม","three"],
+"sǎawng":["สอง","two"],
+"sǐi":["สี","color"],
+"sǔai":["สวย","beautiful","Rising tone. Flat suai means unlucky."],
+"thaang":["ทาง","way / path"],
+"thaawn":["ทอน","to give change"],
+"thai":["ไทย","Thai"],
+"thoo-rá-sàp":["โทรศัพท์","telephone"],
+"thà-nǒn":["ถนน","road / street"],
+"thàai-rûup":["ถ่ายรูป","to take a photo"],
+"thá-lee":["ทะเล","sea"],
+"tháawng":["ท้อง","stomach / belly"],
+"tháek-sîi":["แท็กซี่","taxi"],
+"thâo-rài":["เท่าไหร่","how much"],
+"thít-chûu":["ทิชชู่","tissue"],
+"thîao":["เที่ยว","to travel / to go out for fun"],
+"thîi":["ที่","at / place / that (linking word)"],
+"thîi-nân":["ที่นั่น","there"],
+"thîi-nîi":["ที่นี่","here"],
+"thîi-nǎi":["ที่ไหน","where"],
+"thòe":["เถอะ","let's… (go-ahead particle)"],
+"thùa-lí-sǒng":["ถั่วลิสง","peanuts"],
+"thùuk":["ถูก","cheap / correct"],
+"thǔng":["ถุง","bag (plastic)"],
+"wan-níi":["วันนี้","today","wan = day."],
+"wee-laa":["เวลา","time"],
+"wát":["วัด","temple"],
+"wâa":["ว่า","that / to say (introduces what was said)"],
+"wâai-náam":["ว่ายน้ำ","to swim"],
+"yaa":["ยา","medicine"],
+"yen":["เย็น","cool / cold / evening"],
+"yin-dii":["ยินดี","glad / pleased"],
+"yung":["ยุง","mosquito"],
+"yàak":["อยาก","to want (to do something)"],
+"yài":["ใหญ่","big"],
+"yîi-sìp":["ยี่สิบ","twenty"],
+"yùu":["อยู่","to be located / to stay"],
+"à-mee-rí-gaa":["อเมริกา","America"],
+"à-rai":["อะไร","what"],
+"à-ràwy":["อร่อย","delicious"],
+"àawk":["ออก","to leave / to exit"],
+"ìik":["อีก","again / more"],
+"ìm":["อิ่ม","full (from eating)"],
+"ùuen":["อื่น","other"],
+"dì-chǎn":["ดิฉัน","I / me (formal, female)"],
+"khǎo":["เขา","he / him / she / her / they","In speech one word covers them all."],
+"thooe":["เธอ","she / her (also casual \"you\")"],
+"rao":["เรา","we / us","Also a casual, friendly \"I\"."],
+"phûak-rao":["พวกเรา","we / us (all of us)","phûak = group."],
+"phûak-khǎo":["พวกเขา","they / them"],
+"man":["มัน","it","For things and animals only."],
+"eeng":["เอง","-self / on one's own","chǎn eeng = I myself / it's me."],
+"nân":["นั่น","that (standalone)"],
+"khrai":["ใคร","who / anyone"],
+"thúk":["ทุก","every"],
+"khon":["คน","person / people","Also the counting word for people."],
+"phûuean":["เพื่อน","friend"],
+"phîi":["พี่","older sibling / polite address for someone older"],
+"náawng":["น้อง","younger sibling / polite address for someone younger"],
+"mâae":["แม่","mother"],
+"phâaw":["พ่อ","father"],
+"gàp":["กับ","with / and"]
+};
 /* ---------- state ---------- */
 const KEY="sawatdee-v1";
 const INTERVALS=[0,1,2,4,7,14,30,60];
@@ -545,7 +884,7 @@ function P(id){if(!S.ph[id])S.ph[id]={lv:0,due:todayStr(),intro:false};return S.
 function introCount(u){let c=0;PHRASES.forEach(p=>{if((u===undefined||p.u===u)&&S.ph[p.id]&&(S.ph[p.id].intro||S.ph[p.id].off))c++;});return c;}
 function unitTotal(u){return RAW[u].length;}
 function dueIds(){const t=todayStr();return PHRASES.filter(p=>S.ph[p.id]&&S.ph[p.id].intro&&!S.ph[p.id].off&&S.ph[p.id].due<=t).map(p=>p.id);}
-function activeUnit(){for(let u=0;u<UNITS.length;u++){if(introCount(u)<unitTotal(u))return u;}return UNITS.length-1;}
+function activeUnit(){for(const u of UORDER){if(introCount(u)<unitTotal(u))return u;}return UORDER[UORDER.length-1];}
 function dlgUnlocked(u){return introCount(u)>=Math.ceil(unitTotal(u)*0.8);}
 
 /* ---------- tts ---------- */
@@ -574,8 +913,31 @@ function starChip(id){const on=isStar(id);return '<button class="starchip'+(on?"
 function wireStars(root){root.querySelectorAll("[data-star]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const id=+b.dataset.star;const st=P(id);st.star=!st.star;if(st.star&&st.due>addDays(todayStr(),2))st.due=addDays(todayStr(),2);save();b.classList.toggle("on",st.star);b.textContent=st.star?"★ In frequent review":"☆ Review often";}));}
 function isOff(id){return !!(S.ph[id]&&S.ph[id].off);}
 function offChip(id){const on=isOff(id);return '<button class="starchip'+(on?" offon":"")+'" data-off="'+id+'">'+(on?"Retired — tap to restore":"Retire this phrase")+'</button>';}
-function wireOffs(root){root.querySelectorAll("[data-off]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const id=+b.dataset.off;const st=P(id);st.off=!st.off;if(!st.off)st.due=todayStr();save();b.classList.toggle("offon",st.off);b.textContent=st.off?"Retired — tap to restore":"Retire this phrase";}));}
-const LSHORT=["Greetings","Numbers","Food","Transport","Shopping","Directions","Health","Small talk"];
+function offLabel(on){return on?"Retired — tap to restore":"Retire this phrase";}
+// Single source of truth for retiring. Updates state, every visible chip, and whichever activity is running.
+function setOff(id,on){const st=P(id);st.off=!!on;if(!st.off)st.due=todayStr();save();
+document.querySelectorAll('[data-off="'+id+'"]').forEach(b=>{b.classList.toggle("offon",st.off);b.textContent=offLabel(st.off);});
+if(LSN&&LSN.onOff)LSN.onOff(id,st.off);
+if(MG&&MG.onOff)MG.onOff(id,st.off);}
+function wireOffs(root){root.querySelectorAll("[data-off]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const id=+b.dataset.off;setOff(id,!isOff(id));}));}
+/* ---------- break it down ---------- */
+function bdTokens(rom){return rom.replace(/…|\.{3}/g,"").trim().split(/\s+/).filter(Boolean).map(t=>({raw:t,key:t.replace(/[!?,.]/g,"")}));}
+function bdBtn(id){return '<button class="starchip" data-bd="'+id+'">Break this down</button>';}
+function bdPanel(p){const toks=bdTokens(p.rom);
+return '<div class="bdwrap"><div class="wchips">'+toks.map((t,k)=>{if(!t.key||t.key==="/")return '<span class="wchip sep">/</span>';const g=GLOSS[t.key];
+  return '<button class="wchip" data-w="'+k+'">'+esc(t.key)+(g?'<span class="wth">'+esc(g[0])+'</span>':"")+'</button>';}).join("")
++'</div><div class="wdef hint">Tap a word to see what it means and hear it on its own.</div></div>';}
+function wireBreakdown(root){root.querySelectorAll("[data-bd]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();
+  const p=PHRASES[+b.dataset.bd];const row=b.closest(".chiprow")||b.parentElement;
+  let panel=row.nextElementSibling;
+  if(panel&&panel.classList.contains("bdwrap")){panel.remove();b.classList.remove("on");return;}
+  row.insertAdjacentHTML("afterend",bdPanel(p));b.classList.add("on");panel=row.nextElementSibling;
+  const toks=bdTokens(p.rom),def=panel.querySelector(".wdef");
+  panel.querySelectorAll("[data-w]").forEach(c=>c.addEventListener("click",()=>{const t=toks[+c.dataset.w];const g=GLOSS[t.key];
+    panel.querySelectorAll(".wchip").forEach(x=>x.classList.toggle("on",x===c));def.classList.remove("hint");
+    def.innerHTML='<span class="wrom">'+esc(t.key)+'</span>'+(g?'<span class="wth">'+esc(g[0])+'</span><div>'+esc(g[1])+'</div>'+(g[2]?'<div class="wnote">'+esc(g[2])+'</div>':""):'<div class="wnote">No breakdown for this word yet.</div>');
+    if(g)speak(g[0],false);}));}));}
+const LSHORT=["Greetings","Numbers","Food","Transport","Shopping","Directions","Health","Small talk","Pronouns"];
 const N_TH=["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
 const N_ROM=["sǔun","nùeng","sǎawng","sǎam","sìi","hâa","hòk","jèt","bpàaet","gâo"];
 function numParts(n){
@@ -613,13 +975,13 @@ app.innerHTML='<div class="view">'
 +'<div class="sub">'+(due>0?due+" phrases due for review":"Nothing due — nice and current")+(newLeft>0?" · new: "+UNITS[au].n:"")+'</div>'
 +'<button class="bigbtn" id="startbtn">Start today’s session</button>'
 +'<div class="counts"><span>'+learned+' / '+total+' phrases learned</span><span>'+S.sessions+' sessions</span></div></div>'
-+'<button class="unitrow" id="lsnbtn"><span class="thglyph">'+ICO.phones+'</span><span class="uinfo"><span class="uname">Listen mode</span><br><span class="usub">Hands-free audio of your learned phrases — English, then the Thai twice</span></span><span class="uprog">'+learned+'</span></button>'
++'<button class="unitrow" id="lsnbtn"><span class="thglyph">'+ICO.phones+'</span><span class="uinfo"><span class="uname">Listen mode</span><br><span class="usub">Hands-free audio of your learned phrases — English then Thai, or Thai first. Keeps playing with the screen locked</span></span><span class="uprog">'+learned+'</span></button>'
 +'<button class="unitrow" id="matchbtn"><span class="thglyph">'+ICO.matchI+'</span><span class="uinfo"><span class="uname">Match game</span><br><span class="usub">Tap a Thai word to hear it, then find its meaning</span></span><span class="uprog">'+learned+'</span></button>'
 +'<div class="card"><div class="progressbar"><i style="width:'+Math.round(100*learned/total)+'%"></i></div>'
 +'<div class="pacenote">'+(onPace?'<b>On pace</b> for the trip':'<b class="behind">A little behind</b> — pace target is '+expected)+' · '+learned+' learned, target '+expected+' by today</div></div>'
 +'<div class="sectionlabel">Units</div>'
-+UNITS.map((u,i)=>{const ic=introCount(i),tot=unitTotal(i);const unlocked=dlgUnlocked(i);const done=S.dlg.includes(i);
-return '<button class="unitrow'+(i===au?" active":"")+'" data-unit="'+i+'"><span class="thglyph">'+u.g+'</span><span class="uinfo"><span class="uname">'+esc(u.n)+' <span style="font-family:var(--font-th);color:var(--ink2);font-weight:400">'+u.th+'</span></span><br><span class="usub">'+esc(u.d)+'</span>'+(unlocked?'<br><span class="dlgchip'+(done?" done":"")+'">'+(done?"✓ ":"")+'Dialogue: '+esc(DIALOGUES[i].t)+'</span>':"")+'</span><span class="uprog'+(ic>=tot?" done":"")+'">'+ic+'/'+tot+'</span></button>';}).join("")
++UORDER.map(i=>{const u=UNITS[i];const ic=introCount(i),tot=unitTotal(i);const unlocked=dlgUnlocked(i);const done=S.dlg.includes(i);
+return '<button class="unitrow'+(i===au?" active":"")+'" data-unit="'+i+'"><span class="thglyph">'+uGlyph(i)+'</span><span class="uinfo"><span class="uname">'+esc(u.n)+' <span style="font-family:var(--font-th);color:var(--ink2);font-weight:400">'+u.th+'</span></span><br><span class="usub">'+esc(u.d)+'</span>'+(unlocked?'<br><span class="dlgchip'+(done?" done":"")+'">'+(done?"✓ ":"")+'Dialogue: '+esc(DIALOGUES[i].t)+'</span>':"")+'</span><span class="uprog'+(ic>=tot?" done":"")+'">'+ic+'/'+tot+'</span></button>';}).join("")
 +'</div>'+navBar("home");
 wireNav();
 document.getElementById("startbtn").addEventListener("click",()=>startSession());
@@ -669,7 +1031,7 @@ if(it.teach){
   const st=P(it.id);st.intro=true;st.lv=0;st.due=todayStr();save();
   app.innerHTML='<div class="fullview">'+top
   +'<div class="teach"><span class="newtag">New phrase</span><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'
-  +audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'<div class="chiprow">'+starChip(it.id)+offChip(it.id)+'</div>'+TONE+'</div>'
+  +audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'<div class="chiprow">'+starChip(it.id)+offChip(it.id)+bdBtn(it.id)+'</div>'+TONE+'</div>'
   +'<button class="checkbtn" id="cont">Got it</button></div>';
   wireCommon();speak(p.th,false);
   document.getElementById("cont").addEventListener("click",()=>{SES.i++;renderStep();});
@@ -714,9 +1076,9 @@ app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
   document.getElementById("fb").innerHTML=(ok
     ?'<div class="feedback good">ถูกต้อง! Correct — <span class="fbrom">'+esc(p.rom)+'</span></div>'
     :'<div class="feedback bad">Not quite. It’s <span class="fbrom">'+esc(p.rom)+'</span> — '+esc(p.en)+'</div>')
-    +'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+'</div>'
+    +'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+bdBtn(p.id)+'</div>'
     +'<div class="tonelegend" style="margin-top:.3rem">tap any answer to hear it spoken</div>';
-  wireStars(document.getElementById("fb"));wireOffs(document.getElementById("fb"));
+  wireStars(document.getElementById("fb"));wireOffs(document.getElementById("fb"));wireBreakdown(document.getElementById("fb"));
   speak(p.th,false);
   const c=document.getElementById("cont");c.disabled=false;c.focus();
 }));
@@ -746,8 +1108,8 @@ cont.addEventListener("click",()=>{
     document.getElementById("fb").innerHTML=(ok
       ?'<div class="feedback good">ถูกต้อง! That’s the one — <span class="fbrom">'+esc(p.rom)+'</span></div>'
       :'<div class="feedback bad">Not that one. It was <span class="fbrom">'+esc(p.rom)+'</span> — tap them to compare</div>')
-      +'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+'</div>';
-    wireStars(document.getElementById("fb"));wireOffs(document.getElementById("fb"));
+      +'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+bdBtn(p.id)+'</div>';
+    wireStars(document.getElementById("fb"));wireOffs(document.getElementById("fb"));wireBreakdown(document.getElementById("fb"));
     speak(p.th,false);cont.textContent="Continue";
   }else{SES.i++;renderStep();}
 });
@@ -772,8 +1134,8 @@ cont.addEventListener("click",()=>{
     const ans=built.map(k=>bank[k].i).join(",");const ok=ans===toks.map((_,i)=>i).join(",");
     grade(it,ok);
     document.getElementById("fb").innerHTML=(ok?'<div class="feedback good">ถูกต้อง! Correct!</div>':'<div class="feedback bad">It’s: <span class="fbrom">'+esc(toks.join(" "))+'</span></div>')
-    +'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+'</div>';
-    wireStars(document.getElementById("fb"));wireOffs(document.getElementById("fb"));
+    +'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+bdBtn(p.id)+'</div>';
+    wireStars(document.getElementById("fb"));wireOffs(document.getElementById("fb"));wireBreakdown(document.getElementById("fb"));
     speak(p.th,false);cont.textContent="Continue";
   }else{SES.i++;renderStep();}
 });
@@ -797,7 +1159,7 @@ app.innerHTML='<div class="fullview"><div class="finish"><div class="bigth">เ�
 +'</div><button class="checkbtn" id="cont">Back home</button></div>';
 document.getElementById("cont").addEventListener("click",renderHome);
 }
-function wireCommon(){wireAudio(app);wireStars(app);wireOffs(app);const q=document.getElementById("quit");if(q)q.addEventListener("click",renderHome);}
+function wireCommon(){wireAudio(app);wireStars(app);wireOffs(app);wireBreakdown(app);const q=document.getElementById("quit");if(q)q.addEventListener("click",renderHome);}
 
 /* ---------- dialogue ---------- */
 function startDialogue(u,fromSession){
@@ -811,9 +1173,9 @@ function step(){
     const usedPh=[];d.steps.forEach(stp=>{if(!stp.c){const o=stp.o.find(x=>x[2]);const ph=o&&PHRASES.find(p=>p.rom===o[0]);if(ph&&!usedPh.includes(ph))usedPh.push(ph);}});
     app.innerHTML='<div class="fullview"><div class="finish" style="flex:0;padding:1.2rem 0"><div class="bigth">จบ!</div><h2>Scene complete</h2><p>'+esc(d.t)+' · '+(mistakes===0?"flawless!":mistakes+" retr"+(mistakes>1?"ies":"y"))+'</p></div>'
     +(usedPh.length?'<div class="card"><div class="sectionlabel" style="margin:0 0 .4rem">Phrases from this scene</div>'
-      +usedPh.map(ph=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line)"><button data-say="'+esc(ph.th)+'" style="text-align:left;flex:1"><span style="font-family:var(--font-w);font-weight:600">'+esc(ph.rom)+'</span><br><span style="font-size:.78rem;color:var(--ink2)">'+esc(ph.en)+'</span></button>'+starChip(ph.id)+'</div>').join("")+'</div>':"")
+      +usedPh.map(ph=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line)"><button data-say="'+esc(ph.th)+'" style="text-align:left;flex:1"><span style="font-family:var(--font-w);font-weight:600">'+esc(ph.rom)+'</span><br><span style="font-size:.78rem;color:var(--ink2)">'+esc(ph.en)+'</span></button></div><div class="chiprow" style="margin:0 0 .5rem">'+starChip(ph.id)+offChip(ph.id)+bdBtn(ph.id)+'</div>').join("")+'</div>':"")
     +'<button class="checkbtn" id="cont">Back home</button></div>';
-    wireAudio(app);wireStars(app);
+    wireAudio(app);wireStars(app);wireOffs(app);wireBreakdown(app);
     document.getElementById("cont").addEventListener("click",renderHome);return;
   }
   const st=d.steps[i];
@@ -871,60 +1233,105 @@ while(lsnAlive(my)){
   if(!np)break;
   np.innerHTML='<span class="newtag">Now playing</span><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>';
   if(lc)lc.textContent=(LSN.i+1)+" / "+LSN.ids.length;
-  updMore();
+  updMore();if(LSN.updOff)LSN.updOff();bgMeta(p);
   speechSynthesis.cancel();
-  await speakOnce(p.en.replace(/\s*\(.*?\)/g,"").replace(/…|\.{3}/g,""),"en-US",1);
-  if(!lsnAlive(my))break; await lsnWait(3000);
+  const en=p.en.replace(/\s*\(.*?\)/g,"").replace(/…|\.{3}/g,"");
   const th=p.th.replace(/…|\.{3}/g,"").trim();
-  await speakOnce(th,"th-TH",0.85);
-  if(!lsnAlive(my))break; await lsnWait(600);
-  await speakOnce(th,"th-TH",0.85);
-  if(!lsnAlive(my))break; await lsnWait(1100);
+  if(LSN.thaiFirst){
+    // Thai first: hear it, think, then get the meaning — and one more Thai to lock it in.
+    await speakOnce(th,"th-TH",0.85);
+    if(!lsnAlive(my))break; await lsnWait(3000);
+    await speakOnce(en,"en-US",1);
+    if(!lsnAlive(my))break; await lsnWait(600);
+    await speakOnce(th,"th-TH",0.85);
+    if(!lsnAlive(my))break; await lsnWait(1100);
+  }else{
+    await speakOnce(en,"en-US",1);
+    if(!lsnAlive(my))break; await lsnWait(3000);
+    await speakOnce(th,"th-TH",0.85);
+    if(!lsnAlive(my))break; await lsnWait(600);
+    await speakOnce(th,"th-TH",0.85);
+    if(!lsnAlive(my))break; await lsnWait(1100);
+  }
   LSN.i++;
 }
 }
-function lsnStop(){if(!LSN)return;LSN.playing=false;LSN.gen++;speechSynthesis.cancel();lsnReleaseWake();}
+function lsnStop(){if(!LSN)return;LSN.playing=false;LSN.gen++;speechSynthesis.cancel();lsnReleaseWake();bgStop();}
+/* background playback: a near-silent looping track keeps the page's audio session alive when the screen locks,
+   and gives the lock screen / headphone buttons something to control via the Media Session API. */
+let BG=null;
+function silentTrack(){const sr=8000,n=sr*2,buf=new Uint8Array(44+n),dv=new DataView(buf.buffer);
+const w=(o,s)=>{for(let i=0;i<s.length;i++)buf[o+i]=s.charCodeAt(i);};
+w(0,"RIFF");dv.setUint32(4,36+n,true);w(8,"WAVE");w(12,"fmt ");dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,sr,true);dv.setUint32(28,sr,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,"data");dv.setUint32(40,n,true);
+for(let i=0;i<n;i++)buf[44+i]=128+((i>>6)&1?1:-1);
+return URL.createObjectURL(new Blob([buf],{type:"audio/wav"}));}
+function bgAudio(){if(BG)return BG;const a=document.createElement("audio");a.loop=true;a.setAttribute("playsinline","");a.preload="auto";a.volume=0.02;a.src=silentTrack();BG=a;return a;}
+function bgStart(){try{bgAudio().play().catch(()=>{});}catch(e){}
+if("mediaSession"in navigator){try{const ms=navigator.mediaSession;ms.playbackState="playing";
+  ms.setActionHandler("play",()=>{if(LSN&&LSN.ctl&&!LSN.playing)LSN.ctl.toggle();});
+  ms.setActionHandler("pause",()=>{if(LSN&&LSN.ctl&&LSN.playing)LSN.ctl.toggle();});
+  ms.setActionHandler("nexttrack",()=>{if(LSN&&LSN.ctl)LSN.ctl.skip();});
+  ms.setActionHandler("previoustrack",()=>{if(LSN&&LSN.ctl)LSN.ctl.back();});}catch(e){}}}
+function bgStop(){if(BG){try{BG.pause();}catch(e){}}if("mediaSession"in navigator){try{navigator.mediaSession.playbackState="paused";}catch(e){}}}
+function bgMeta(p){if(!("mediaSession"in navigator)||!("MediaMetadata"in window))return;try{navigator.mediaSession.metadata=new MediaMetadata({title:p.rom,artist:p.en,album:"Sawatdee · listen mode"});}catch(e){}}
+// iOS sometimes leaves speech paused after backgrounding; nudge it.
+setInterval(()=>{try{if(LSN&&LSN.playing&&speechSynthesis.paused)speechSynthesis.resume();}catch(e){}},2000);
 function renderListen(){
-LSN={ids:[],i:0,playing:false,gen:0,starOnly:false,wake:null,units:new Set([0,1,2,3,4,5,6,7])};
+LSN={ids:[],i:0,playing:false,gen:0,starOnly:false,wake:null,units:new Set(UNITS.map((_,i)=>i)),thaiFirst:!!S.lsnThaiFirst};
 lsnBuild();
 const empty=!LSN.ids.length;
 app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit" aria-label="Exit listen mode">×</button><div style="flex:1;font-family:var(--font-d);font-weight:700">Listen mode</div></div>'
 +ttsBanner()
 +(empty
 ? '<div class="finish"><div class="bigth">ฟัง</div><h2>Nothing to play yet</h2><p>Listen mode plays phrases you have already learned — do a session or two first.</p></div>'
-: '<div class="teach" id="np" style="min-height:11rem"><span class="newtag">Ready</span><span class="en">English first, then the Thai twice.</span><span class="rom" style="font-size:1.2rem;color:var(--ink2)">Press play, pocket the phone, go lift.</span></div>'
-+'<div class="lsnunits" id="lu">'+UNITS.map((u,i)=>'<button class="uchip on" data-u="'+i+'">'+LSHORT[i]+'</button>').join("")+'<button class="uchip" id="lsnnum">Numbers 1–10,000</button><button class="uchip" id="lsnstar">★ Review often</button></div>'
-+'<div style="text-align:center;margin-top:.2rem"><button class="starchip" id="lsnmore">☆ Hear this phrase more often</button></div>'
+: '<div class="teach" id="np" style="min-height:11rem"><span class="newtag">Ready</span><span class="en" id="lsnorderdesc">'+(LSN.thaiFirst?"Thai first, a pause to think, then the English.":"English first, then the Thai twice.")+'</span><span class="rom" style="font-size:1.2rem;color:var(--ink2)">Press play, lock the phone, go lift.</span></div>'
++'<div class="lsnunits"><button class="uchip'+(LSN.thaiFirst?"":" on")+'" id="lsnen">English → Thai</button><button class="uchip'+(LSN.thaiFirst?" on":"")+'" id="lsnth">Thai → English</button></div>'
++'<div class="lsnunits" id="lu">'+UORDER.map(i=>'<button class="uchip on" data-u="'+i+'">'+LSHORT[i]+'</button>').join("")+'<button class="uchip" id="lsnnum">Numbers 1–10,000</button><button class="uchip" id="lsnstar">★ Review often</button></div>'
++'<div class="chiprow" style="justify-content:center;margin-top:.2rem"><button class="starchip" id="lsnmore">☆ Hear this phrase more often</button><button class="starchip" id="lsnoff" disabled>Retire this phrase</button></div>'
 +'<div class="lsncount" id="lc">'+LSN.ids.length+' phrases · shuffled</div>'
 +'<div class="lsnrow"><button class="skipbtn" id="back" aria-label="Back one phrase">'+ICO.prevI+'</button>'
 +'<button class="ppbtn" id="pp" aria-label="Play">'+ICO.play+'</button>'
 +'<button class="skipbtn" id="skip" aria-label="Skip">'+ICO.skipI+'</button></div>'
-+'<p class="notice" style="text-align:center">Keeps your screen awake while playing — audio stops if the app is closed. Going back tells the app you want that phrase more often.</p>')
++'<p class="notice" style="text-align:center">Lock the screen or switch apps — audio keeps going, and the lock-screen controls pause and skip. Most reliable on Android; iPhone may still stop after a while. Going back tells the app you want that phrase more often.</p>')
 +'</div>';
 document.getElementById("quit").addEventListener("click",()=>{lsnStop();LSN=null;renderHome();});
 if(empty)return;
-const pp=document.getElementById("pp");
+const pp=document.getElementById("pp"),offBtn=document.getElementById("lsnoff");
+function updOff(){const ent=LSN.cur;if(ent===undefined||ent<0){offBtn.disabled=true;offBtn.classList.remove("offon");offBtn.textContent="Retire this phrase";return;}
+  offBtn.disabled=false;offBtn.classList.toggle("offon",isOff(ent));offBtn.textContent=offLabel(isOff(ent));}
+LSN.onOff=(id,on)=>{if(!on)return;const cur=LSN.ids[LSN.i];LSN.ids=LSN.ids.filter(x=>x!==id);if(LSN.i>=LSN.ids.length)LSN.i=0;if(cur===id){restart(false);if(!LSN.ids.length){LSN.playing=false;LSN.gen++;speechSynthesis.cancel();lsnReleaseWake();bgStop();pp.innerHTML=ICO.play;const np=document.getElementById("np");if(np)np.innerHTML='<span class="newtag">Done</span><span class="en">Nothing left to play with these filters.</span>';}}else lcText();updOff();};
 function lcText(){const lc=document.getElementById("lc");if(lc)lc.textContent=LSN.ids.length+" phrases · "+(LSN.starOnly?"starred only":"shuffled");}
-function restart(rebuild){const was=LSN.playing;LSN.gen++;LSN.playing=false;speechSynthesis.cancel();if(rebuild)lsnBuild();lcText();updMore();
+function restart(rebuild){const was=LSN.playing;LSN.gen++;LSN.playing=false;speechSynthesis.cancel();if(rebuild)lsnBuild();lcText();updMore();updOff();
   if(was&&LSN.ids.length){LSN.playing=true;LSN.gen++;lsnLoop();}
-  else if(was){pp.innerHTML=ICO.play;pp.setAttribute("aria-label","Play");lsnReleaseWake();}}
-pp.addEventListener("click",()=>{
-  if(LSN.playing){LSN.playing=false;LSN.gen++;speechSynthesis.cancel();lsnReleaseWake();pp.innerHTML=ICO.play;pp.setAttribute("aria-label","Play");}
-  else if(LSN.ids.length){LSN.playing=true;LSN.gen++;pp.innerHTML=ICO.pauseI;pp.setAttribute("aria-label","Pause");lsnLoop();}
-});
-document.getElementById("skip").addEventListener("click",()=>{
+  else if(was){pp.innerHTML=ICO.play;pp.setAttribute("aria-label","Play");lsnReleaseWake();bgStop();}}
+function toggle(){
+  if(LSN.playing){LSN.playing=false;LSN.gen++;speechSynthesis.cancel();lsnReleaseWake();bgStop();pp.innerHTML=ICO.play;pp.setAttribute("aria-label","Play");}
+  else if(LSN.ids.length){bgStart();LSN.playing=true;LSN.gen++;pp.innerHTML=ICO.pauseI;pp.setAttribute("aria-label","Pause");lsnLoop();}
+}
+function skip(){
   if(!LSN.ids.length)return;
   LSN.i++;if(LSN.i>=LSN.ids.length)LSN.i=0;
   restart(false);
-});
-document.getElementById("back").addEventListener("click",()=>{
+}
+function back(){
   if(!LSN.ids.length)return;
   LSN.i=(LSN.i-1+LSN.ids.length)%LSN.ids.length;
   const id=LSN.ids[LSN.i];
   if(id>=0){const st=P(id);const cap=addDays(todayStr(),2);if(st.due>cap)st.due=cap;save();}
   LSN.ids.splice(Math.min(LSN.ids.length,LSN.i+5),0,id);
   restart(false);
-});
+}
+LSN.ctl={toggle,skip,back};LSN.updOff=updOff;
+pp.addEventListener("click",toggle);
+document.getElementById("skip").addEventListener("click",skip);
+document.getElementById("back").addEventListener("click",back);
+offBtn.addEventListener("click",()=>{const ent=LSN.cur;if(ent===undefined||ent<0)return;setOff(ent,!isOff(ent));});
+function setOrder(thaiFirst){LSN.thaiFirst=thaiFirst;S.lsnThaiFirst=thaiFirst;save();
+  document.getElementById("lsnen").classList.toggle("on",!thaiFirst);document.getElementById("lsnth").classList.toggle("on",thaiFirst);
+  const d=document.getElementById("lsnorderdesc");if(d)d.textContent=thaiFirst?"Thai first, a pause to think, then the English.":"English first, then the Thai twice.";
+  restart(false);}
+document.getElementById("lsnen").addEventListener("click",()=>setOrder(false));
+document.getElementById("lsnth").addEventListener("click",()=>setOrder(true));
 document.getElementById("lsnmore").addEventListener("click",function(){
   const ent=LSN.cur;if(ent===undefined||ent<0)return;
   const st=P(ent);st.star=!st.star;
@@ -947,7 +1354,7 @@ document.querySelectorAll("#lu [data-u]").forEach(b=>b.addEventListener("click",
   b.classList.toggle("on",LSN.units.has(u));
   restart(true);
 }));
-updMore();
+updMore();updOff();
 }
 
 /* ---------- match game ---------- */
@@ -960,6 +1367,9 @@ if(pool.length<6){
   document.getElementById("quit").addEventListener("click",renderHome);return;
 }
 MG={pool,queue:shuffle(pool.slice()),board:[],sel:-1,score:0,miss:0,busy:false};
+MG.onOff=(id,on)=>{if(!MG)return;
+  if(on){MG.queue=MG.queue.filter(x=>x!==id);const k=MG.board.indexOf(id);if(k>=0&&!MG.busy){MG.board[k]=mgNext();MG.sel=-1;mgDraw();}}
+  else if(!MG.pool.includes(id))MG.pool.push(id);};
 MG.board=MG.queue.splice(0,5);
 MG.rorder=shuffle([0,1,2,3,4]);
 app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div style="flex:1;font-family:var(--font-d);font-weight:700">Match game</div><div class="streakchip" id="mscore"></div></div>'
@@ -977,8 +1387,8 @@ const j=MG.queue.findIndex(fit);
 return j>=0?MG.queue.splice(j,1)[0]:MG.board[0];
 }
 function mgLast(id,good){const p=PHRASES[id];const el=document.getElementById("mlast");if(!el)return;
-el.innerHTML='<div class="feedback '+(good?"good":"bad")+'"><span class="fbrom">'+esc(p.rom)+'</span> — '+esc(p.en)+'</div><div class="chiprow">'+starChip(id)+offChip(id)+'</div>';
-wireStars(el);wireOffs(el);}
+el.innerHTML='<div class="feedback '+(good?"good":"bad")+'"><span class="fbrom">'+esc(p.rom)+'</span> — '+esc(p.en)+'</div><div class="chiprow">'+starChip(id)+offChip(id)+bdBtn(id)+'</div>';
+wireStars(el);wireOffs(el);wireBreakdown(el);}
 function mgDraw(){
 if(!MG)return;
 document.getElementById("mscore").textContent=MG.score+" matched · "+MG.miss+" missed";
@@ -1035,13 +1445,13 @@ function step(){
   app.innerHTML='<div class="fullview"><div class="sesstop"><button class="x" id="quit">×</button><div class="progressbar"><i style="width:'+Math.round(100*i/ids.length)+'%"></i></div></div>'
   +'<div class="exprompt">Memory check '+(i+1)+' of '+ids.length+' — does this ring a bell?</div>'
   +'<div class="teach"><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)
-  +'<div id="reveal" style="display:none"><span class="en" style="font-size:1.15rem;font-weight:700;color:var(--ink)">'+esc(p.en)+'</span>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+'</div></div></div>'
+  +'<div id="reveal" style="display:none"><span class="en" style="font-size:1.15rem;font-weight:700;color:var(--ink)">'+esc(p.en)+'</span>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+bdBtn(p.id)+'</div></div></div>'
   +'<div id="btns" style="margin-top:auto"><button class="checkbtn" id="show">Show meaning</button></div></div>';
   wireAudio(app);speak(p.th,false);
   document.getElementById("quit").addEventListener("click",()=>{S.placed=true;save();renderHome();});
   document.getElementById("show").addEventListener("click",()=>{
     document.getElementById("reveal").style.display="block";
-    wireStars(app);wireOffs(app);
+    wireStars(app);wireOffs(app);wireBreakdown(app);
     document.getElementById("btns").innerHTML='<div class="btnrow"><button class="checkbtn secondary" id="no" style="margin-top:0">Not yet</button><button class="checkbtn" id="yes" style="margin-top:0">I knew it</button></div>';
     document.getElementById("yes").addEventListener("click",()=>{const st=P(p.id);st.intro=true;st.lv=3;st.due=addDays(todayStr(),4);knew++;save();i++;step();});
     document.getElementById("no").addEventListener("click",()=>{i++;step();});
@@ -1058,10 +1468,12 @@ function rowHtml(p){const st=S.ph[p.id];const cls=st&&st.intro?(st.lv>=4?"l2":"l
   return '<button class="pbrow'+(isOff(p.id)?" off":"")+'" data-id="'+p.id+'"><span><span class="pben">'+(isStar(p.id)?'<span class="pbstar">★</span>':"")+esc(p.en)+'</span><br><span class="pbrom">'+esc(p.rom)+'</span></span><span class="lvl '+cls+'"></span></button>';}
 const starred=PHRASES.filter(p=>isStar(p.id)&&(!filter||p.en.toLowerCase().includes(filter)||p.rom.toLowerCase().includes(filter)));
 if(starred.length)rows+='<div class="pbunit" style="color:var(--accent-deep)">★ Frequent review</div>'+starred.map(rowHtml).join("");
-UNITS.forEach((u,ui)=>{
+const retired=PHRASES.filter(p=>isOff(p.id)&&(!filter||p.en.toLowerCase().includes(filter)||p.rom.toLowerCase().includes(filter)));
+if(retired.length)rows+='<div class="pbunit" style="color:var(--bad)">Retired — tap one to restore it</div>'+retired.map(rowHtml).join("");
+UORDER.forEach(ui=>{const u=UNITS[ui];
   const ps=PHRASES.filter(p=>p.u===ui&&(!filter||p.en.toLowerCase().includes(filter)||p.rom.toLowerCase().includes(filter)));
   if(!ps.length)return;
-  rows+='<div class="pbunit">'+u.g+' '+esc(u.n)+'</div>'+ps.map(rowHtml).join("");
+  rows+='<div class="pbunit">'+uGlyph(ui)+' '+esc(u.n)+'</div>'+ps.map(rowHtml).join("");
 });
 app.innerHTML='<div class="view"><div class="topbar"><div class="brand"><span class="th">สวัสดี</span>Phrasebook</div></div>'
 +'<div class="searchrow"><input id="q" type="search" placeholder="Search English or Thai sounds…" value="'+esc(filter)+'"></div>'
@@ -1074,8 +1486,8 @@ app.querySelectorAll("[data-id]").forEach(b=>b.addEventListener("click",()=>show
 function showPhrase(id,back){
 const p=PHRASES[id];
 const ov=document.createElement("div");ov.className="overlay";
-ov.innerHTML='<div class="sheet"><div class="handle"></div><div class="teach" style="border:none;padding:0;background:none"><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+'</div>'+TONE+'</div></div>';
-document.body.appendChild(ov);wireAudio(ov);wireStars(ov);wireOffs(ov);speak(p.th,false);
+ov.innerHTML='<div class="sheet"><div class="handle"></div><div class="teach" style="border:none;padding:0;background:none"><span class="en">'+esc(p.en)+'</span><span class="rom">'+esc(p.rom)+'</span><span class="th">'+esc(p.th)+'</span>'+audioBtns(p.th,true)+(p.note?'<div class="note">'+esc(p.note)+'</div>':"")+'<div class="chiprow">'+starChip(p.id)+offChip(p.id)+bdBtn(p.id)+'</div>'+TONE+'</div></div>';
+document.body.appendChild(ov);wireAudio(ov);wireStars(ov);wireOffs(ov);wireBreakdown(ov);speak(p.th,false);
 ov.addEventListener("click",e=>{if(e.target===ov){ov.remove();if(back)back();}});
 }
 
